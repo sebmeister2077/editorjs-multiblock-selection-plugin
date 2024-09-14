@@ -13,5 +13,8 @@
         "dist/index.d.ts"
     ],
     "author": "sebmeister2077",
-    "license": "MIT"
+    "license": "MIT",
+    "devDependencies": {
+        "@editorjs/editorjs": "^2.30.6"
+    }
 }
