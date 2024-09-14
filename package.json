@@ -1,0 +1,17 @@
+{
+    "name": "editorjs-multiblock-selection-plugin",
+    "version": "0.0.1",
+    "description": "Plugin to handle multiblock selection",
+    "scripts": {
+        "build": "webpack --mode production",
+        "build:dev": "webpack --mode development --watch --output-filename=dev-build.js"
+    },
+    "main": "./dist/bundle.js",
+    "types": "./dist/index.d.ts",
+    "files": [
+        "dist/bundle.js",
+        "dist/index.d.ts"
+    ],
+    "author": "sebmeister2077",
+    "license": "MIT"
+}
