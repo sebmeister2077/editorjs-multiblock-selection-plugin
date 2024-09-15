@@ -15,6 +15,16 @@
     "author": "sebmeister2077",
     "license": "MIT",
     "devDependencies": {
-        "@editorjs/editorjs": "^2.30.6"
+        "@babel/core": "^7.25.2",
+        "@babel/preset-env": "^7.25.4",
+        "@editorjs/editorjs": "^2.30.6",
+        "babel-loader": "^9.1.3",
+        "css-loader": "^7.1.2",
+        "raw-loader": "^4.0.2",
+        "style-loader": "^4.0.0",
+        "ts-loader": "^9.5.1",
+        "typescript": "^5.6.2",
+        "webpack": "^5.94.0",
+        "webpack-cli": "^5.1.4"
     }
 }

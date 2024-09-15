@@ -3,7 +3,7 @@ import "./index.css";
 
 export type SelectedBlock = { blockId: string; index: number };
 export default class MultiBlockSelectionPlugin {
-    public static SELECTION_CHANGED_EVENT_NAME =
+    public static SELECTION_EVENT_NAME =
         "block-selection-changed"
 
     private editor: EditorJs;
@@ -21,10 +21,12 @@ export default class MultiBlockSelectionPlugin {
                 if (mutation.type !== "attributes" || !(mutation.target instanceof HTMLElement)) return;
 
                 const { target } = mutation;
-                const blockId = target.getAttribute("data-id");
-                if (!blockId) return;
+                const blockId = this.getBlockIdForElement(target);
+                if (!blockId) return
+
                 const block = this.editor.blocks.getById(blockId);
                 if (!block) return;
+
                 const isSelected = block.selected;
                 const isAlreadySelected = this.selectedBlocks.some(({ blockId }) => blockId === block.id);
                 if (isSelected == isAlreadySelected) return;
@@ -39,8 +41,9 @@ export default class MultiBlockSelectionPlugin {
             });
 
             if (!shouldDispatchEvent || this.isInlineOpen) return;
+
             window.dispatchEvent(
-                new CustomEvent(MultiBlockSelectionPlugin.SELECTION_CHANGED_EVENT_NAME, {
+                new CustomEvent(MultiBlockSelectionPlugin.SELECTION_EVENT_NAME, {
                     detail: { selectedBlocks: this.selectedBlocks },
                 })
             );
@@ -133,6 +136,22 @@ export default class MultiBlockSelectionPlugin {
         toolbar.classList.add(
             this.EditorCSS.inlineToolbarShowed,
         );
+    }
+
+    // handle multiple editorjs versions..
+    private getBlockIdForElement(target: HTMLElement) {
+        let blockId = target.getAttribute("data-id");
+        if (blockId) return blockId;
+
+        blockId = this.editor.blocks.getBlockByElement?.(target)?.id ?? null;
+        if (blockId) return blockId;
+
+        const blockIndex = Array.from(target.parentElement?.children ?? []).indexOf(target);
+        if (blockIndex == null)
+            return null;
+
+        blockId = this.editor.blocks.getBlockByIndex(blockIndex)?.id ?? null;
+        return blockId;
     }
 
     private getDOMBlockById(blockId: string) {
