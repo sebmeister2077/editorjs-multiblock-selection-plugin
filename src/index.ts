@@ -2,17 +2,27 @@ import EditorJs from "@editorjs/editorjs";
 import "./index.css";
 
 export type SelectedBlock = { blockId: string; index: number };
+export type ConstructorProps = {
+    editor: EditorJs,
+    /**
+     * In case you want to hide some items from the toolbar
+     * @param toolbar 
+     */
+    onBeforeToolbarOpen?(toolbar: HTMLElement): void;
+}
 export default class MultiBlockSelectionPlugin {
     public static SELECTION_EVENT_NAME =
         "block-selection-changed"
 
+    private onBeforeToolbarOpen: ConstructorProps['onBeforeToolbarOpen'];
     private editor: EditorJs;
     private observer: MutationObserver;
     private selectedBlocks: SelectedBlock[] = [];
     private isInlineOpen = false;
     private redactorElement: HTMLElement | null = null;
-    constructor({ editor }: { editor: EditorJs }) {
+    constructor({ editor, onBeforeToolbarOpen }: ConstructorProps) {
         this.editor = editor;
+        this.onBeforeToolbarOpen = onBeforeToolbarOpen
 
         //needed for block level selections
         this.observer = new MutationObserver((mutations) => {
@@ -69,6 +79,7 @@ export default class MultiBlockSelectionPlugin {
             inlineToolbarShowed: "ce-inline-toolbar--showed",
         };
     }
+
     private get CSS() {
         return {
             blockSelected: "ce-custom-block-selection",
@@ -111,15 +122,15 @@ export default class MultiBlockSelectionPlugin {
     };
 
     private closeInlineToolbar() {
-        if (this.isInlineOpen) {
-            this.getInlineToolbar()?.classList.remove(
-                this.EditorCSS.inlineToolbarShowed,
-            );
-            document
-                .querySelectorAll(`.${this.CSS.blockSelected}`)
-                .forEach((el) => el.classList.remove(this.CSS.blockSelected));
-            this.isInlineOpen = false;
-        }
+        if (!this.isInlineOpen) return;
+        const toolbar = this.getInlineToolbar();
+        toolbar?.classList.remove(
+            this.EditorCSS.inlineToolbarShowed,
+        );
+        document
+            .querySelectorAll(`.${this.CSS.blockSelected}`)
+            .forEach((el) => el.classList.remove(this.CSS.blockSelected));
+        this.isInlineOpen = false;
     }
 
     private openInlineToolbar() {
@@ -131,7 +142,8 @@ export default class MultiBlockSelectionPlugin {
             .querySelectorAll(`.${this.EditorCSS.selected}`)
             .forEach((el) => el.classList.add(this.CSS.blockSelected));
 
-        toolbar.style.left = `max(120px,${toolbar.style.left ?? "0px"})`;
+        this.onBeforeToolbarOpen?.(toolbar)
+
         this.isInlineOpen = true;
         toolbar.classList.add(
             this.EditorCSS.inlineToolbarShowed,
