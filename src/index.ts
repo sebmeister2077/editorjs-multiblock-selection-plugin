@@ -150,8 +150,10 @@ export default class MultiBlockSelectionPlugin {
 
         this.isInlineOpen = true;
 
-        if (!toolbar.style.left || toolbar.style.left === "unset") {
-            const { left, top } = this.getToolbarPositionFor2_28_1Version() ?? {}
+        const shouldAddPositionToToolbar = !toolbar.style.left || toolbar.style.left === "unset" || toolbar.style.left == "0px";
+        if (shouldAddPositionToToolbar) {
+            const positionData = this.getToolbarPositionFor2_28_1Version()
+            const { left, top } = positionData ?? {}
             toolbar.style.left = `${left}px`;
             if (top !== undefined)
                 toolbar.style.top = `${top}px`;
