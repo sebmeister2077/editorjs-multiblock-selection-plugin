@@ -1,7 +1,7 @@
 import EditorJs from "@editorjs/editorjs";
 import "./index.css";
 
-export type SelectedBlock = { blockId: string; index: number };
+export type SelectedBlock = { blockId: string; index: number, isFirstSelected?: boolean };
 export type ConstructorProps = {
     editor: EditorJs,
     /**
@@ -44,7 +44,10 @@ export default class MultiBlockSelectionPlugin {
                 shouldDispatchEvent = true;
                 const index = Array.from(target.parentElement?.children ?? []).indexOf(target);
                 if (isSelected) {
-                    this.selectedBlocks.push({ blockId: block.id, index });
+                    const selectionData: SelectedBlock = { blockId: block.id, index };
+                    if (this.selectedBlocks.length === 0)
+                        selectionData.isFirstSelected = true;
+                    this.selectedBlocks.push(selectionData);
                 } else {
                     this.selectedBlocks = this.selectedBlocks.filter(({ blockId }) => blockId !== block.id);
                 }
@@ -75,6 +78,7 @@ export default class MultiBlockSelectionPlugin {
             selected: "ce-block--selected",
             redactor: "codex-editor__redactor",
             block: "ce-block",
+            blockContent: "ce-block__content",
             inlineToolbar: "ce-inline-toolbar",
             inlineToolbarShowed: "ce-inline-toolbar--showed",
         };
@@ -145,6 +149,15 @@ export default class MultiBlockSelectionPlugin {
         this.onBeforeToolbarOpen?.(toolbar)
 
         this.isInlineOpen = true;
+
+        if (!toolbar.style.left || toolbar.style.left === "unset") {
+            const { left, top } = this.getToolbarPositionFor2_28_1Version() ?? {}
+            toolbar.style.left = `${left}px`;
+            if (top !== undefined)
+                toolbar.style.top = `${top}px`;
+        }
+
+        // toolbar.style.left = `max(120px,${toolbar.style.left ?? "0px"})`
         toolbar.classList.add(
             this.EditorCSS.inlineToolbarShowed,
         );
@@ -172,10 +185,10 @@ export default class MultiBlockSelectionPlugin {
         let block = this.editor.blocks.getById(blockId)?.holder ?? null;
         if ((block instanceof HTMLElement)) return block;
 
-        block = document.querySelector(`.${this.EditorCSS.block}[data-id='${blockId}']`);
+        block = this.redactorElement?.querySelector(`.${this.EditorCSS.block}[data-id='${blockId}']`) ?? null;
         if ((block instanceof HTMLElement)) return block;
 
-        block = document.querySelector(`.${this.EditorCSS.redactor} .${this.EditorCSS.block}:nth-child(${index})`)
+        block = this.redactorElement?.querySelector(`.${this.EditorCSS.block}:nth-child(${index})`) ?? null;
         if ((block instanceof HTMLElement)) return block;
         return null;
     }
@@ -184,5 +197,37 @@ export default class MultiBlockSelectionPlugin {
         const toolbar = document.querySelector(`.${this.EditorCSS.inlineToolbar}`);
         if (!(toolbar instanceof HTMLElement)) return null;
         return toolbar;
+    }
+
+    private getLeftDistanceForToolbar() {
+        const anyBlockEl = this.redactorElement?.querySelector(`.${this.EditorCSS.block}`);
+        const contentEl = anyBlockEl?.querySelector(`.${this.EditorCSS.blockContent}`);
+
+        if (!(anyBlockEl instanceof HTMLElement) || !(contentEl instanceof HTMLElement)) return null;
+
+        return contentEl.getBoundingClientRect().left - anyBlockEl.getBoundingClientRect().left
+    }
+
+    private getToolbarPositionFor2_28_1Version() {
+        const firstSelectedBlockData = this.selectedBlocks.find(d => d.isFirstSelected);
+        if (!firstSelectedBlockData) return null;
+        const toolbarRect = this.getInlineToolbar()?.getBoundingClientRect();
+
+        let left = this.getLeftDistanceForToolbar();
+        if (left === null) return null;
+        left += (toolbarRect?.width || 0) / 2;
+        left = Math.round(left);
+        left += 16;// margin
+
+        const blockEl = this.getDOMBlockByIdOrIdx(firstSelectedBlockData.blockId, firstSelectedBlockData.index)
+        const redactorTop = this.redactorElement?.getBoundingClientRect().top
+        if (!blockEl || redactorTop === undefined) return { left };
+
+
+        let top = blockEl.getBoundingClientRect().top - redactorTop
+        top += toolbarRect?.height || 0;
+        top = Math.ceil(top)
+
+        return { left, top }
     }
 }

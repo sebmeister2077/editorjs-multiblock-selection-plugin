@@ -3,6 +3,7 @@ import "./index.css";
 export type SelectedBlock = {
     blockId: string;
     index: number;
+    isFirstSelected?: boolean;
 };
 export type ConstructorProps = {
     editor: EditorJs;
@@ -32,4 +33,6 @@ export default class MultiBlockSelectionPlugin {
     private getBlockIdForElement;
     private getDOMBlockByIdOrIdx;
     private getInlineToolbar;
+    private getLeftDistanceForToolbar;
+    private getToolbarPositionFor2_28_1Version;
 }
