@@ -103,10 +103,8 @@ export default class MultiBlockSelectionPlugin {
         const lastSelectedElement = [...this.selectedBlocks].sort(sortByIndex).reverse()[0];
         if (!lastSelectedElement) return;
 
-        console.log("🚀 ~ MultiBlockSelectionPlugin ~ lastSelectedElement:", lastSelectedElement)
         const { blockId, index } = lastSelectedElement;
         const el = this.getDOMBlockByIdOrIdx(blockId, index);
-        console.log("🚀 ~ MultiBlockSelectionPlugin ~ el:", el)
         if (!el) return;
 
         this.openInlineToolbar();
@@ -159,7 +157,10 @@ export default class MultiBlockSelectionPlugin {
     }
 
     private getDOMBlockByIdOrIdx(blockId: string, index: number) {
-        let block = document.querySelector(`.${this.EditorCSS.block}[data-id='${blockId}']`);
+        let block = this.editor.blocks.getById(blockId)?.holder ?? null;
+        if ((block instanceof HTMLElement)) return block;
+
+        block = document.querySelector(`.${this.EditorCSS.block}[data-id='${blockId}']`);
         if ((block instanceof HTMLElement)) return block;
 
         block = document.querySelector(`.${this.EditorCSS.redactor} .${this.EditorCSS.block}:nth-child(${index})`)
