@@ -23,6 +23,6 @@ export default class MultiBlockSelectionPlugin {
     private closeInlineToolbar;
     private openInlineToolbar;
     private getBlockIdForElement;
-    private getDOMBlockById;
+    private getDOMBlockByIdOrIdx;
     private getInlineToolbar;
 }

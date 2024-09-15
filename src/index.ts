@@ -103,8 +103,10 @@ export default class MultiBlockSelectionPlugin {
         const lastSelectedElement = [...this.selectedBlocks].sort(sortByIndex).reverse()[0];
         if (!lastSelectedElement) return;
 
+        console.log("🚀 ~ MultiBlockSelectionPlugin ~ lastSelectedElement:", lastSelectedElement)
         const { blockId, index } = lastSelectedElement;
-        const el = this.getDOMBlockById(blockId);
+        const el = this.getDOMBlockByIdOrIdx(blockId, index);
+        console.log("🚀 ~ MultiBlockSelectionPlugin ~ el:", el)
         if (!el) return;
 
         this.openInlineToolbar();
@@ -143,7 +145,9 @@ export default class MultiBlockSelectionPlugin {
         let blockId = target.getAttribute("data-id");
         if (blockId) return blockId;
 
-        blockId = this.editor.blocks.getBlockByElement?.(target)?.id ?? null;
+        blockId = this.editor.blocks
+            //@ts-ignore
+            .getBlockByElement?.(target)?.id ?? null;
         if (blockId) return blockId;
 
         const blockIndex = Array.from(target.parentElement?.children ?? []).indexOf(target);
@@ -154,10 +158,13 @@ export default class MultiBlockSelectionPlugin {
         return blockId;
     }
 
-    private getDOMBlockById(blockId: string) {
-        const block = document.querySelector(`.${this.EditorCSS.block}[data-id='${blockId}']`);
-        if (!(block instanceof HTMLElement)) return null;
-        return block;
+    private getDOMBlockByIdOrIdx(blockId: string, index: number) {
+        let block = document.querySelector(`.${this.EditorCSS.block}[data-id='${blockId}']`);
+        if ((block instanceof HTMLElement)) return block;
+
+        block = document.querySelector(`.${this.EditorCSS.redactor} .${this.EditorCSS.block}:nth-child(${index})`)
+        if ((block instanceof HTMLElement)) return block;
+        return null;
     }
 
     private getInlineToolbar() {
