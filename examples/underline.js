@@ -10,10 +10,10 @@ class ExtendedUnderline extends Underline {
         })
     }
 
-    surround(el) {
-        if (!(el instanceof Range)) return
+    surround(range) {
+        if (!(range instanceof Range)) return
         if (!this.selectedBlocks.length) {
-            super.surround(el)
+            super.surround(range)
             return
         }
         let isAppliedOnAllSelectedBlocks = true
