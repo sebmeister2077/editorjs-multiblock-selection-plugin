@@ -1,4 +1,5 @@
 class Bold {
+    elementTagName = 'b'
     constructor() {
         this.selectedBlocks = []
         window.addEventListener(MultiBlockSelectionPlugin.SELECTION_EVENT_NAME, (ev) => {
@@ -24,7 +25,7 @@ class Bold {
             if (!(textEl instanceof HTMLElement)) return
             const allText = el.textContent
 
-            const firstBoldEl = textEl.querySelector('b')
+            const firstBoldEl = textEl.querySelector(this.elementTagName)
             const isAppliedOnCurrentBlock = firstBoldEl && firstBoldEl.textContent == allText
 
             if (isAppliedOnCurrentBlock) return
@@ -39,21 +40,21 @@ class Bold {
             if (!(textEl instanceof HTMLElement)) return
             const allText = el.textContent
 
-            const firstBoldEl = textEl.querySelector('b')
+            const firstBoldEl = textEl.querySelector(this.elementTagName)
             const isAppliedOnCurrentBlock = firstBoldEl && firstBoldEl.textContent == allText
             const shouldRemove = isAppliedOnAllSelectedBlocks
             const shouldAdd = !isAppliedOnAllSelectedBlocks && !isAppliedOnCurrentBlock
 
             if (shouldRemove) {
-                textEl.querySelectorAll('b').forEach((b) => b.replaceWith(...b.childNodes))
+                textEl.querySelectorAll(this.elementTagName).forEach((b) => b.replaceWith(...b.childNodes))
                 return
             }
 
             if (!shouldAdd) return
 
-            textEl.querySelectorAll('b').forEach((b) => b.replaceWith(...b.childNodes))
+            textEl.querySelectorAll(this.elementTagName).forEach((b) => b.replaceWith(...b.childNodes))
 
-            const newBold = document.createElement('b')
+            const newBold = document.createElement(this.elementTagName)
             newBold.append(...textEl.childNodes)
 
             textEl.replaceChildren(newBold)

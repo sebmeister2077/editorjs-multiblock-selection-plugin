@@ -1,4 +1,5 @@
 class ExtendedUnderline extends Underline {
+    elementTagName = 'u'
     constructor(props) {
         super(props)
 
@@ -25,7 +26,7 @@ class ExtendedUnderline extends Underline {
             if (!(textEl instanceof HTMLElement)) return
             const allText = el.textContent
 
-            const firstBoldEl = textEl.querySelector('u')
+            const firstBoldEl = textEl.querySelector(this.elementTagName)
             const isAppliedOnCurrentBlock = firstBoldEl && firstBoldEl.textContent == allText
 
             if (isAppliedOnCurrentBlock) return
@@ -43,22 +44,22 @@ class ExtendedUnderline extends Underline {
             if (!(textEl instanceof HTMLElement)) return
             const allText = el.textContent
 
-            const firstUnderlineEl = textEl.querySelector('u')
+            const firstUnderlineEl = textEl.querySelector(this.elementTagName)
             const isAppliedOnCurrentBlock = firstUnderlineEl && firstUnderlineEl.textContent == allText
             const shouldRemove = isAppliedOnAllSelectedBlocks
             const shouldAdd = !isAppliedOnAllSelectedBlocks && !isAppliedOnCurrentBlock
 
             if (shouldRemove) {
-                textEl.querySelectorAll('u').forEach((b) => b.replaceWith(...b.childNodes))
+                textEl.querySelectorAll(this.elementTagName).forEach((b) => b.replaceWith(...b.childNodes))
 
                 return
             }
 
             if (!shouldAdd) return
 
-            textEl.querySelectorAll('u').forEach((b) => b.remove())
+            textEl.querySelectorAll(this.elementTagName).forEach((b) => b.replaceWith(...b.childNodes))
 
-            const newUnderline = document.createElement('u')
+            const newUnderline = document.createElement(this.elementTagName)
             newUnderline.append(...textEl.childNodes)
 
             textEl.replaceChildren(newUnderline)
