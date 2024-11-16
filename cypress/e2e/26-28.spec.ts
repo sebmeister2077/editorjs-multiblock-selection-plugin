@@ -44,6 +44,7 @@ describe('Versions 26-28', () => {
                 .should('have.class', 'ce-inline-toolbar--showed')
                 .find(underlineToolSelector)
                 .should('exist');
+
             const expectedBlocks = cy.get(`.ce-block:nth-child(-n+${maxIndex + 1}):nth-child(n+${minIndex + 1})`)
             expectedBlocks
                 .should("have.length", amountOfExpectedBlocks)
@@ -53,19 +54,23 @@ describe('Versions 26-28', () => {
 
             // Make selected blocks underlined
             cy.applyUnderline();
-            // cy.wait(100)
-            // expectedBlocks.find("u").should("have.length", amountOfExpectedBlocks);
+            expectedBlocks.find("u").should("have.length", amountOfExpectedBlocks);
 
 
 
-            // // Make no blocks underlined
-            // cy.applyUnderline();
-            // cy.wait(100)
-            // expectedBlocks.find("u").should("have.length", 0);
+            // Make no blocks underlined
+            cy.applyUnderline();
+            cy.get(".ce-block u").should("have.length", 0);
 
 
+            // Verify toolbar closes when clicking outside
+            cy.get('.codex-editor__redactor').click();
+            expectedBlocks
+                .should("not.have.class", "ce-block--selected")
+                .should("not.have.class", 'ce-custom-block-selection')
 
-
+            cy.get('.ce-inline-toolbar')
+                .should('not.have.class', 'ce-inline-toolbar--showed')
         })
 
 
