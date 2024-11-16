@@ -34,7 +34,12 @@ Cypress.Commands.add("applyEditorSelection", (startIndex: number, endIndex: numb
 })
 
 Cypress.Commands.add("applyUnderline", () => {
-    cy.get(".ce-inline-tool[data-tool=underline]").click();
+    cy.get(".ce-inline-tool[data-tool=underline]")
+        .trigger("mousedown")
+        .trigger("click")
+        .trigger("pointerdown")
+        .trigger("pointerup")
+        .trigger("mouseup");
 })
 
 declare global {
