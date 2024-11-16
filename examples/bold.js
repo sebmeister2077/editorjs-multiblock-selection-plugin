@@ -1,3 +1,4 @@
+// Editor v2.28
 class Bold {
     elementTagName = 'b'
     constructor() {

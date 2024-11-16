@@ -1,3 +1,4 @@
+// Editor v2.28
 class ExtendedUnderline extends Underline {
     elementTagName = 'u'
     constructor(props) {
