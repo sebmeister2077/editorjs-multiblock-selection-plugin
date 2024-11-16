@@ -8,3 +8,7 @@ editor.isReady.then(() => {
 ```
 
 You can find tool examples in the examples folder
+
+
+## Working versions of EditorJS
+- v2.28
