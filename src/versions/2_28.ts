@@ -38,7 +38,7 @@ export class MultiBlockSelectionPlugin_V2_28 {
                 const block = this.editor.blocks.getById(blockId);
                 if (!block) return;
 
-                const isSelected = block.selected;
+                const isSelected = block.selected || target.classList.contains(this.EditorCSS.selected);
                 const isAlreadySelected = this.selectedBlocks.some(({ blockId }) => blockId === block.id);
                 if (isSelected == isAlreadySelected) return;
 
