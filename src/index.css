@@ -1,3 +1,14 @@
 .ce-custom-block-selection .ce-block__content {
     background-color: #e1f2ff;
 }
+
+.temporary-toolbar-selected {
+    max-height: 0px;
+    max-width: 0px;
+    overflow: hidden;
+    visibility: hidden;
+}
+
+.temporary-block-selected::selection {
+    background-color: transparent;
+}

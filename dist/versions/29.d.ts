@@ -13,7 +13,7 @@ export type ConstructorProps = {
      */
     onBeforeToolbarOpen?(toolbar: HTMLElement): void;
     /**
-     * This is used internally for hiding the toolbar for versions 2.29 and up because toolbars dont have initially all its features rendered inside of it
+     * This is used internally for hiding the toolbar for versions 2.29 because toolbars dont have initially all its features rendered inside of it
      * Increase value if toolbar glitching occurs when callins listen()
      * @default 200
      */
