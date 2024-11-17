@@ -11,7 +11,7 @@ export type ConstructorProps = {
     onBeforeToolbarOpen?(toolbar: HTMLElement): void;
 }
 
-export class MultiBlockSelectionPlugin_V2_20to28 {
+export class MultiBlockSelectionPlugin_V2_29 {
     public static SELECTION_EVENT_NAME =
         "block-selection-changed"
 
@@ -49,6 +49,7 @@ export class MultiBlockSelectionPlugin_V2_20to28 {
                     if (this.selectedBlocks.length === 0)
                         selectionData.isFirstSelected = true;
                     this.selectedBlocks.push(selectionData);
+                    this.verifyToolbarIsMountedWithItems();
                 } else {
                     this.selectedBlocks = this.selectedBlocks.filter(({ blockId }) => blockId !== block.id);
                 }
@@ -57,7 +58,7 @@ export class MultiBlockSelectionPlugin_V2_20to28 {
             if (!shouldDispatchEvent || this.isInlineOpen) return;
 
             window.dispatchEvent(
-                new CustomEvent(MultiBlockSelectionPlugin_V2_20to28.SELECTION_EVENT_NAME, {
+                new CustomEvent(MultiBlockSelectionPlugin_V2_29.SELECTION_EVENT_NAME, {
                     detail: { selectedBlocks: this.selectedBlocks },
                 })
             );
@@ -81,6 +82,7 @@ export class MultiBlockSelectionPlugin_V2_20to28 {
             block: "ce-block",
             blockContent: "ce-block__content",
             inlineToolbar: "ce-inline-toolbar",
+            inlineToolbarButtons: "ce-inline-toolbar__buttons",
             inlineToolbarShowed: "ce-inline-toolbar--showed",
         };
     }
@@ -164,6 +166,13 @@ export class MultiBlockSelectionPlugin_V2_20to28 {
         toolbar.classList.add(
             this.EditorCSS.inlineToolbarShowed,
         );
+    }
+
+    private verifyToolbarIsMountedWithItems() {
+        const toolbar = this.getInlineToolbar();
+        if (!toolbar) return;
+        const buttonsContainer = toolbar.querySelector(`.${this.EditorCSS.inlineToolbarButtons}`)
+
     }
 
     // handle multiple editorjs versions..

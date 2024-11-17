@@ -13,7 +13,7 @@ export type ConstructorProps = {
      */
     onBeforeToolbarOpen?(toolbar: HTMLElement): void;
 };
-export declare class MultiBlockSelectionPlugin_V2_20to28 {
+export declare class MultiBlockSelectionPlugin_V2_29 {
     static SELECTION_EVENT_NAME: string;
     private onBeforeToolbarOpen;
     private editor;
@@ -30,6 +30,7 @@ export declare class MultiBlockSelectionPlugin_V2_20to28 {
     private onRedactorMouseUp;
     private closeInlineToolbar;
     private openInlineToolbar;
+    private verifyToolbarIsMountedWithItems;
     private getBlockIdForElement;
     private getDOMBlockByIdOrIdx;
     private getInlineToolbar;
