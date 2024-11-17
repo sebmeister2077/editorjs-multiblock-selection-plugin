@@ -71,8 +71,6 @@ export default function getMultiBlockSelectionPluginForVersion(version: EditorVe
         case "2.30.7":
             return MultiBlockSelectionPlugin_V2_30
         default:
-            if ((globalThis as any).Cypress)
-                return MultiBlockSelectionPlugin_V2_20to28;
-            console.error("Given EditorJS version is not compatible with multiblock plugin")
+            console.error("Given EditorJS version is not compatible with multiblock selection plugin")
     }
 }
