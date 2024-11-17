@@ -1,4 +1,4 @@
-import { MultiBlockSelectionPlugin_V2_28 } from "./versions/2_28";
+import { MultiBlockSelectionPlugin_V2_28 } from "./versions/23-28";
 export type EditorVersions = {
     V30: `2.30${"" | ".0" | ".1" | ".2" | ".3" | ".4" | ".5" | ".6" | ".7"}`
     V29: `2.29${"" | ".0" | ".1" | ".2"}`

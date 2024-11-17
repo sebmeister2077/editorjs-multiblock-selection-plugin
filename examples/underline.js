@@ -1,4 +1,5 @@
-// Editor v2.28
+// Editor v2.23-v2.28
+const MultiBlockSelectionPlugin = getMultiBlockSelectionPluginForVersion(EditorJS.version)
 class ExtendedUnderline extends Underline {
     elementTagName = 'u'
     constructor(props) {

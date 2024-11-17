@@ -1,4 +1,5 @@
-// Editor v2.28
+// Editor v2.23-v2.28
+const MultiBlockSelectionPlugin = getMultiBlockSelectionPluginForVersion(EditorJS.version)
 class Bold {
     elementTagName = 'b'
     constructor() {
