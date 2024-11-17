@@ -9,6 +9,7 @@
     visibility: hidden;
 }
 
-.temporary-block-selected::selection {
-    background-color: transparent;
+.temporary-block-selected::selection,
+.temporary-block-selected *::selection {
+    background-color: transparent !important;
 }

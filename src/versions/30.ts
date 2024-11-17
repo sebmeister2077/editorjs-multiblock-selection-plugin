@@ -148,6 +148,9 @@ export class MultiBlockSelectionPlugin_V2_30 {
         document
             .querySelectorAll(`.${this.CSS.blockSelected}`)
             .forEach((el) => el.classList.remove(this.CSS.blockSelected));
+        document.querySelectorAll(`.${this.CSS.temporaryBlockSelected}`)
+            .forEach(el => el.classList.remove(this.CSS.temporaryBlockSelected))
+
         this.isInlineOpen = false;
     }
 
@@ -209,11 +212,16 @@ export class MultiBlockSelectionPlugin_V2_30 {
             e.stopPropagation();
         }
 
+        editableElement.classList.add(this.CSS.temporaryBlockSelected)
         this.editor.inlineToolbar.open();
         window.addEventListener("selectionchange", stopSelectionChangeListener, {
             capture: true,
         })
-        selection.removeAllRanges();
+        setTimeout(() => {
+            window.removeEventListener("selectionchange", stopSelectionChangeListener, {
+                capture: true
+            })
+        }, 50);
     }
 
     // handle multiple editorjs versions..

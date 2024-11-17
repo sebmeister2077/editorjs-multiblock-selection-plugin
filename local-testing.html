@@ -47,25 +47,25 @@ https://cdn.jsdelivr.net/npm/@editorjs/list@1.10.0/dist/list.umd.min.js
                 const version = window.editorVersion
                 const MultiBlockSelectionPlugin = self.MultiBlockSelectionPlugin(version)
 
+                let selectedBlocks = []
                 class ExtendedUnderline extends Underline {
                     constructor(props) {
                         super(props)
 
-                        this.selectedBlocks = []
                         window.addEventListener(MultiBlockSelectionPlugin.SELECTION_EVENT_NAME, (ev) => {
                             queueMicrotask(() => {
-                                this.selectedBlocks = ev.detail.selectedBlocks.slice()
+                                selectedBlocks = ev.detail.selectedBlocks.slice()
                             })
                         })
                     }
 
                     surround(range) {
-                        if (!this.selectedBlocks.length) {
+                        if (!selectedBlocks.length) {
                             super.surround(range)
                             return
                         }
                         let isAppliedOnAllSelectedBlocks = true
-                        this.selectedBlocks.forEach(({ index }) => {
+                        selectedBlocks.forEach(({ index }) => {
                             const el = document.querySelector(`.codex-editor__redactor .ce-block:nth-child(${index + 1})`)
                             if (!(el instanceof HTMLElement)) return
 
@@ -80,7 +80,7 @@ https://cdn.jsdelivr.net/npm/@editorjs/list@1.10.0/dist/list.umd.min.js
                             isAppliedOnAllSelectedBlocks = false
                         })
 
-                        this.selectedBlocks.forEach(({ index }) => {
+                        selectedBlocks.forEach(({ index }) => {
                             const block = this.api.blocks.getBlockByIndex(index)
                             if (!block) return
 
