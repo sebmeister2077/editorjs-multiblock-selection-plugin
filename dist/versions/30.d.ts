@@ -37,6 +37,7 @@ export declare class MultiBlockSelectionPlugin_V2_30 {
     private onRedactorMouseUp;
     private closeInlineToolbar;
     private openInlineToolbar;
+    private globalClickListenerForToolbarClose;
     private verifyToolbarIsMountedWithItems;
     private getBlockIdForElement;
     private getDOMBlockByIdOrIdx;

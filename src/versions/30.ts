@@ -150,6 +150,7 @@ export class MultiBlockSelectionPlugin_V2_30 {
             .forEach((el) => el.classList.remove(this.CSS.blockSelected));
         document.querySelectorAll(`.${this.CSS.temporaryBlockSelected}`)
             .forEach(el => el.classList.remove(this.CSS.temporaryBlockSelected))
+        window.removeEventListener("click", this.globalClickListenerForToolbarClose.bind(this), { capture: true });
 
         this.isInlineOpen = false;
     }
@@ -180,6 +181,16 @@ export class MultiBlockSelectionPlugin_V2_30 {
         toolbar.classList.add(
             this.EditorCSS.inlineToolbarShowed,
         );
+        window.addEventListener("click", this.globalClickListenerForToolbarClose.bind(this), { capture: true });
+    }
+
+    private globalClickListenerForToolbarClose(e: MouseEvent) {
+        if (!this.isInlineOpen) return;
+        if (!(e.target instanceof HTMLElement)) return;
+        const isInsideOfRedactor = this.redactorElement === e.target || this.redactorElement?.contains(e.target)
+        if (isInsideOfRedactor) return;
+
+        this.closeInlineToolbar();
     }
 
     private verifyToolbarIsMountedWithItems() {

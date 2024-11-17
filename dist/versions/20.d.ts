@@ -11,16 +11,23 @@ export type ConstructorProps = {
      * @param toolbar
      */
     onBeforeToolbarOpen?(toolbar: HTMLElement): void;
+    /**
+    * This is used internally for hiding the toolbar, because toolbars dont have initially all its features rendered inside of it
+    * Increase value if toolbar glitching occurs when callins listen()
+    * @default 200
+    */
+    toolbarHiddenTimeoutMs?: number;
 };
 export declare class MultiBlockSelectionPlugin_V2_20 {
     static SELECTION_EVENT_NAME: string;
     private onBeforeToolbarOpen;
     private editor;
+    private toolbarHiddenTimeoutMs;
     private observer;
     private selectedBlocks;
     private isInlineOpen;
     private redactorElement;
-    constructor({ editor, onBeforeToolbarOpen }: ConstructorProps);
+    constructor({ editor, onBeforeToolbarOpen, toolbarHiddenTimeoutMs }: ConstructorProps);
     listen(): void;
     unlisten(): void;
     private get EditorCSS();
@@ -29,6 +36,8 @@ export declare class MultiBlockSelectionPlugin_V2_20 {
     private onRedactorMouseUp;
     private closeInlineToolbar;
     private openInlineToolbar;
+    private globalClickListenerForToolbarClose;
+    private verifyToolbarIsMountedWithItems;
     private getBlockIndexForElement;
     private getDOMBlockByIdx;
     private getInlineToolbar;

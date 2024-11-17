@@ -10,7 +10,7 @@ export type ConstructorProps = {
      */
     onBeforeToolbarOpen?(toolbar: HTMLElement): void;
     /**
-    * This is used internally for hiding the toolbar for versions 2.29 because toolbars dont have initially all its features rendered inside of it
+    * This is used internally for hiding the toolbar, because toolbars dont have initially all its features rendered inside of it
     * Increase value if toolbar glitching occurs when callins listen()
     * @default 200
     */
@@ -147,8 +147,9 @@ export class MultiBlockSelectionPlugin_V2_20to28 {
         document
             .querySelectorAll(`.${this.CSS.blockSelected}`)
             .forEach((el) => el.classList.remove(this.CSS.blockSelected));
-        this.isInlineOpen = false;
         window.removeEventListener("click", this.globalClickListenerForToolbarClose.bind(this), { capture: true });
+
+        this.isInlineOpen = false;
     }
 
     private openInlineToolbar() {
@@ -189,6 +190,7 @@ export class MultiBlockSelectionPlugin_V2_20to28 {
 
         this.closeInlineToolbar();
     }
+
     private verifyToolbarIsMountedWithItems() {
         const toolbar = this.getInlineToolbar();
         if (!toolbar) return;
