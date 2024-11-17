@@ -15,7 +15,7 @@ export type ConstructorProps = {
      * Increase value if toolbar glitching occurs when callins listen()
      * @default 200
      */
-    toolbarHiddenTimeoutMs: number;
+    toolbarHiddenTimeoutMs?: number;
 }
 
 export class MultiBlockSelectionPlugin_V2_29 {

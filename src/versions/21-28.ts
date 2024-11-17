@@ -9,6 +9,12 @@ export type ConstructorProps = {
      * @param toolbar 
      */
     onBeforeToolbarOpen?(toolbar: HTMLElement): void;
+    /**
+    * This is used internally for hiding the toolbar for versions 2.29 because toolbars dont have initially all its features rendered inside of it
+    * Increase value if toolbar glitching occurs when callins listen()
+    * @default 200
+    */
+    toolbarHiddenTimeoutMs?: number;
 }
 
 export class MultiBlockSelectionPlugin_V2_20to28 {
@@ -17,13 +23,15 @@ export class MultiBlockSelectionPlugin_V2_20to28 {
 
     private onBeforeToolbarOpen: ConstructorProps['onBeforeToolbarOpen'];
     private editor: EditorJs;
+    private toolbarHiddenTimeoutMs: ConstructorProps['toolbarHiddenTimeoutMs']
     private observer: MutationObserver;
     private selectedBlocks: SelectedBlock[] = [];
     private isInlineOpen = false;
     private redactorElement: HTMLElement | null = null;
-    constructor({ editor, onBeforeToolbarOpen }: ConstructorProps) {
+    constructor({ editor, onBeforeToolbarOpen, toolbarHiddenTimeoutMs = 200 }: ConstructorProps) {
         this.editor = editor;
         this.onBeforeToolbarOpen = onBeforeToolbarOpen
+        this.toolbarHiddenTimeoutMs = toolbarHiddenTimeoutMs
 
         //needed for block level selections
         this.observer = new MutationObserver((mutations) => {
@@ -66,6 +74,7 @@ export class MultiBlockSelectionPlugin_V2_20to28 {
 
     public listen() {
         this.initEditorListeners();
+        this.verifyToolbarIsMountedWithItems();
     }
 
     public unlisten() {
@@ -81,6 +90,7 @@ export class MultiBlockSelectionPlugin_V2_20to28 {
             block: "ce-block",
             blockContent: "ce-block__content",
             inlineToolbar: "ce-inline-toolbar",
+            inlineToolbarButtons: "ce-inline-toolbar__buttons",
             inlineToolbarShowed: "ce-inline-toolbar--showed",
         };
     }
@@ -88,6 +98,8 @@ export class MultiBlockSelectionPlugin_V2_20to28 {
     private get CSS() {
         return {
             blockSelected: "ce-custom-block-selection",
+            temporaryToolbarSelected: "temporary-toolbar-selected",
+            temporaryBlockSelected: "temporary-block-selected"
         };
     }
 
@@ -166,6 +178,48 @@ export class MultiBlockSelectionPlugin_V2_20to28 {
         );
     }
 
+    private verifyToolbarIsMountedWithItems() {
+        const toolbar = this.getInlineToolbar();
+        if (!toolbar) return;
+        const buttonsContainer = toolbar.querySelector(`.${this.EditorCSS.inlineToolbarButtons}`)
+        if (!(buttonsContainer instanceof HTMLElement)) return;
+
+        const isEmpty = buttonsContainer.childElementCount === 0;
+        if (!isEmpty) return;
+
+        const blockEl = this.getDOMBlockByIdOrIdx("", 0);
+        const editableElement = blockEl?.querySelector("[contenteditable]")
+        if (!(editableElement instanceof HTMLElement)) return;
+
+
+        const selection = document.getSelection();
+        if (!selection) return;
+        const range = document.createRange();
+
+        range.selectNodeContents(editableElement)
+
+        toolbar.classList.add(this.CSS.temporaryToolbarSelected)
+        editableElement.classList.add(this.CSS.temporaryBlockSelected)
+
+        selection.removeAllRanges();
+        selection.addRange(range);
+
+        const toolbarButtonsObserver = new MutationObserver(() => {
+            selection.removeAllRanges();
+            toolbarButtonsObserver.disconnect();
+
+            setTimeout(() => {
+                toolbar.classList.remove(this.CSS.temporaryToolbarSelected)
+            }, this.toolbarHiddenTimeoutMs)
+            editableElement.classList.remove(this.CSS.temporaryBlockSelected)
+        })
+
+        toolbarButtonsObserver.observe(buttonsContainer, {
+            childList: true,
+            subtree: true
+        })
+    }
+
     // handle multiple editorjs versions..
     private getBlockIdForElement(target: HTMLElement) {
         let blockId = target.getAttribute("data-id");
@@ -191,7 +245,7 @@ export class MultiBlockSelectionPlugin_V2_20to28 {
         block = this.redactorElement?.querySelector(`.${this.EditorCSS.block}[data-id='${blockId}']`) ?? null;
         if ((block instanceof HTMLElement)) return block;
 
-        block = this.redactorElement?.querySelector(`.${this.EditorCSS.block}:nth-child(${index})`) ?? null;
+        block = this.redactorElement?.querySelector(`.${this.EditorCSS.block}:nth-child(${index + 1})`) ?? null;
         if ((block instanceof HTMLElement)) return block;
         return null;
     }
