@@ -1,7 +1,8 @@
 import editorData from '../fixtures/editorData.json'
+import { EditorVersions } from './EditorVersions';
 
 
-Cypress.Commands.add("applyEditorSelection", (startIndex: number, endIndex: number) => {
+Cypress.Commands.add("applyEditorSelection", (startIndex, endIndex, version) => {
     const selectedBlockClass = "ce-block--selected"
     const maxIndex = Math.max(startIndex, endIndex);
     const minIndex = Math.min(startIndex, endIndex);
@@ -43,7 +44,7 @@ Cypress.Commands.add("applyUnderline", () => {
 declare global {
     namespace Cypress {
         interface Chainable {
-            applyEditorSelection(startIndex: number, endIndex: number): Cypress.Chainable<void>
+            applyEditorSelection(startIndex: number, endIndex: number, version: EditorVersions[keyof EditorVersions]): Cypress.Chainable<void>
             applyUnderline(): Cypress.Chainable<void>
         }
     }
