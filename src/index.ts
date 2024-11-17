@@ -61,6 +61,14 @@ export default function getMultiBlockSelectionPluginForVersion(version: EditorVe
         case '2.29.2':
             return MultiBlockSelectionPlugin_V2_29;
         case '2.30':
+        case "2.30.0":
+        case "2.30.1":
+        case "2.30.2":
+        case "2.30.3":
+        case "2.30.4":
+        case "2.30.5":
+        case '2.30.6':
+        case "2.30.7":
             return MultiBlockSelectionPlugin_V2_30
         default:
             if ((globalThis as any).Cypress)
