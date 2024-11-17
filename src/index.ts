@@ -32,6 +32,7 @@ export default function getMultiBlockSelectionPluginForVersion(version: EditorVe
         case "2.28.2":
             return MultiBlockSelectionPlugin_V2_28;
         default:
+            return MultiBlockSelectionPlugin_V2_28;
             console.error("Given EditorJS version is not compatible with multiblock plugin")
     }
 }

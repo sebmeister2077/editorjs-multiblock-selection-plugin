@@ -12,4 +12,4 @@ export type EditorVersions = {
     V21: `2.21${"" | ".0"}`;
     V20: `2.20${"" | ".0"}`;
 };
-export default function getMultiBlockSelectionPluginForVersion(version: EditorVersions[keyof EditorVersions]): typeof MultiBlockSelectionPlugin_V2_28 | undefined;
+export default function getMultiBlockSelectionPluginForVersion(version: EditorVersions[keyof EditorVersions]): typeof MultiBlockSelectionPlugin_V2_28;

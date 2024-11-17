@@ -6,12 +6,8 @@
         <title>Test indent</title>
         <script>
             if (!globalThis.Cypress) {
-                document.writeln('<script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@2.26.5"><\/script>')
-                document.onload = () => {
-                    setTimeout(() => {
-                        window.dispatchEvent(new CustomEvent('can-load-editor', { detail: { version: '2.28' } }))
-                    }, 100)
-                }
+                document.writeln('<script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@2.28"><\/script>')
+                window.editorVersion = '2.28'
             } else {
             }
         </script>
@@ -40,7 +36,7 @@ https://cdn.jsdelivr.net/npm/@editorjs/list@1.10.0/dist/list.umd.min.js
     <body>
         <div id="editor" style="background-color: antiquewhite"></div>
         <script>
-            setTimeout(() => {
+            window.addEventListener('loadded-editorjs-script', () => {
                 const version = window.editorVersion
                 const MultiBlockSelectionPlugin = self.MultiBlockSelectionPlugin(version)
 
@@ -148,7 +144,7 @@ https://cdn.jsdelivr.net/npm/@editorjs/list@1.10.0/dist/list.umd.min.js
                     // console.log('🚀 ~ editor.isReady.then ~ editor:', editor)
                     blockSelection.listen()
                 })
-            }, 300)
+            })
         </script>
     </body>
 </html>
