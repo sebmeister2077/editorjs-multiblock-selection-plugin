@@ -33,7 +33,7 @@ export class MultiBlockSelectionPlugin_V2_20 {
 
                 const { target } = mutation;
                 const blockIndex = this.getBlockIndexForElement(target);
-                if (!blockIndex) return
+                if (blockIndex === null) return
 
                 const block = this.editor.blocks.getBlockByIndex(blockIndex)
                 if (!block) return;
