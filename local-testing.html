@@ -6,8 +6,10 @@
         <title>Test indent</title>
         <script>
             if (!globalThis.Cypress) {
-                document.writeln('<script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@2.28"><\/script>')
-                window.editorVersion = '2.28'
+                window.editorVersion = '2.20'
+                document.writeln(
+                    `<script onload="window.dispatchEvent(new CustomEvent('loadded-editorjs-script'));" src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@${window.editorVersion}"><\/script>`,
+                )
             } else {
             }
         </script>
@@ -36,6 +38,11 @@ https://cdn.jsdelivr.net/npm/@editorjs/list@1.10.0/dist/list.umd.min.js
     <body>
         <div id="editor" style="background-color: antiquewhite"></div>
         <script>
+            if (!globalThis.Cypress) {
+                queueMicrotask(() => {
+                    window.dispatchEvent(new CustomEvent('loadded-editorjs-script'))
+                })
+            }
             window.addEventListener('loadded-editorjs-script', () => {
                 const version = window.editorVersion
                 const MultiBlockSelectionPlugin = self.MultiBlockSelectionPlugin(version)
@@ -58,7 +65,7 @@ https://cdn.jsdelivr.net/npm/@editorjs/list@1.10.0/dist/list.umd.min.js
                             return
                         }
                         let isAppliedOnAllSelectedBlocks = true
-                        this.selectedBlocks.forEach(({ blockId, index }) => {
+                        this.selectedBlocks.forEach(({ index }) => {
                             const el = document.querySelector(`.codex-editor__redactor .ce-block:nth-child(${index + 1})`)
                             if (!(el instanceof HTMLElement)) return
 
@@ -73,8 +80,8 @@ https://cdn.jsdelivr.net/npm/@editorjs/list@1.10.0/dist/list.umd.min.js
                             isAppliedOnAllSelectedBlocks = false
                         })
 
-                        this.selectedBlocks.forEach(({ blockId, index }) => {
-                            const block = this.api.blocks.getById(blockId)
+                        this.selectedBlocks.forEach(({ index }) => {
+                            const block = this.api.blocks.getBlockByIndex(index)
                             if (!block) return
 
                             const el = block.holder

@@ -41,7 +41,6 @@ describe('Versions 26-28', () => {
                     data.isResolved = true;
                     data.resolveProm();
                     win.dispatchEvent(new CustomEvent("loadded-editorjs-script"))
-                    win.dispatchEvent(new CustomEvent("can-load-editor", { detail: { version } }))
                 }
                 script.src = `https://cdn.jsdelivr.net/npm/@editorjs/editorjs@${version}`
                 win.document.head.append(script)

@@ -1,7 +1,6 @@
 import EditorJs from "@editorjs/editorjs";
 import "../index.css";
 export type SelectedBlock = {
-    blockId: string;
     index: number;
     isFirstSelected?: boolean;
 };
@@ -30,8 +29,8 @@ export declare class MultiBlockSelectionPlugin_V2_20 {
     private onRedactorMouseUp;
     private closeInlineToolbar;
     private openInlineToolbar;
-    private getBlockIdForElement;
-    private getDOMBlockByIdOrIdx;
+    private getBlockIndexForElement;
+    private getDOMBlockByIdx;
     private getInlineToolbar;
     private getLeftDistanceForToolbar;
     private getToolbarPositionFor2_28_1Version;

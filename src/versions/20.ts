@@ -1,7 +1,7 @@
 import EditorJs from "@editorjs/editorjs";
 import "../index.css";
 
-export type SelectedBlock = { blockId: string; index: number, isFirstSelected?: boolean };
+export type SelectedBlock = { index: number, isFirstSelected?: boolean };
 export type ConstructorProps = {
     editor: EditorJs,
     /**
@@ -32,25 +32,27 @@ export class MultiBlockSelectionPlugin_V2_20 {
                 if (mutation.type !== "attributes" || !(mutation.target instanceof HTMLElement)) return;
 
                 const { target } = mutation;
-                const blockId = this.getBlockIdForElement(target);
-                if (!blockId) return
+                const blockIndex = this.getBlockIndexForElement(target);
+                if (!blockIndex) return
 
-                const block = this.editor.blocks.getById(blockId);
+                const block = this.editor.blocks.getBlockByIndex(blockIndex)
                 if (!block) return;
 
                 const isSelected = block.selected || target.classList.contains(this.EditorCSS.selected);
-                const isAlreadySelected = this.selectedBlocks.some(({ blockId }) => blockId === block.id);
+                const isAlreadySelected = this.selectedBlocks.some(({ index }) => index === blockIndex);
                 if (isSelected == isAlreadySelected) return;
+
+
 
                 shouldDispatchEvent = true;
                 const index = Array.from(target.parentElement?.children ?? []).indexOf(target);
                 if (isSelected) {
-                    const selectionData: SelectedBlock = { blockId: block.id, index };
+                    const selectionData: SelectedBlock = { index };
                     if (this.selectedBlocks.length === 0)
                         selectionData.isFirstSelected = true;
                     this.selectedBlocks.push(selectionData);
                 } else {
-                    this.selectedBlocks = this.selectedBlocks.filter(({ blockId }) => blockId !== block.id);
+                    this.selectedBlocks = this.selectedBlocks.filter(({ index }) => index !== blockIndex);
                 }
             });
 
@@ -107,6 +109,8 @@ export class MultiBlockSelectionPlugin_V2_20 {
     }
 
     private onRedactorMouseUp = (e: MouseEvent) => {
+
+        console.log("🚀 ~ MultiBlockSelectionPlugin_V2_20 ~ selectedBlocks:", this.selectedBlocks.length)
         if (!this.selectedBlocks.length) {
             this.closeInlineToolbar();
             return;
@@ -119,8 +123,8 @@ export class MultiBlockSelectionPlugin_V2_20 {
         const lastSelectedElement = [...this.selectedBlocks].sort(sortByIndex).reverse()[0];
         if (!lastSelectedElement) return;
 
-        const { blockId, index } = lastSelectedElement;
-        const el = this.getDOMBlockByIdOrIdx(blockId, index);
+        const { index } = lastSelectedElement;
+        const el = this.getDOMBlockByIdx(index);
         if (!el) return;
 
         this.openInlineToolbar();
@@ -167,31 +171,13 @@ export class MultiBlockSelectionPlugin_V2_20 {
     }
 
     // handle multiple editorjs versions..
-    private getBlockIdForElement(target: HTMLElement) {
-        let blockId = target.getAttribute("data-id");
-        if (blockId) return blockId;
-
-        blockId = this.editor.blocks
-            //@ts-ignore
-            .getBlockByElement?.(target)?.id ?? null;
-        if (blockId) return blockId;
-
+    private getBlockIndexForElement(target: HTMLElement): number | null {
         const blockIndex = Array.from(target.parentElement?.children ?? []).indexOf(target);
-        if (blockIndex == null)
-            return null;
-
-        blockId = this.editor.blocks.getBlockByIndex(blockIndex)?.id ?? null;
-        return blockId;
+        return blockIndex === -1 ? null : blockIndex;
     }
 
-    private getDOMBlockByIdOrIdx(blockId: string, index: number) {
-        let block = this.editor.blocks.getById(blockId)?.holder ?? null;
-        if ((block instanceof HTMLElement)) return block;
-
-        block = this.redactorElement?.querySelector(`.${this.EditorCSS.block}[data-id='${blockId}']`) ?? null;
-        if ((block instanceof HTMLElement)) return block;
-
-        block = this.redactorElement?.querySelector(`.${this.EditorCSS.block}:nth-child(${index})`) ?? null;
+    private getDOMBlockByIdx(index: number) {
+        let block = this.redactorElement?.querySelector(`.${this.EditorCSS.block}:nth-child(${index})`) ?? null;
         if ((block instanceof HTMLElement)) return block;
         return null;
     }
@@ -222,7 +208,7 @@ export class MultiBlockSelectionPlugin_V2_20 {
         left = Math.round(left);
         left += 16;// margin
 
-        const blockEl = this.getDOMBlockByIdOrIdx(firstSelectedBlockData.blockId, firstSelectedBlockData.index)
+        const blockEl = this.getDOMBlockByIdx(firstSelectedBlockData.index)
         const redactorTop = this.redactorElement?.getBoundingClientRect().top
         if (!blockEl || redactorTop === undefined) return { left };
 
