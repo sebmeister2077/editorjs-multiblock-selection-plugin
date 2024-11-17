@@ -1,6 +1,7 @@
 import { MultiBlockSelectionPlugin_V2_20 } from "./versions/20";
 import { MultiBlockSelectionPlugin_V2_20to28 } from "./versions/21-28";
 import { MultiBlockSelectionPlugin_V2_29 } from "./versions/29";
+import { MultiBlockSelectionPlugin_V2_30 } from "./versions/30";
 export type EditorVersions = {
     V30: `2.30${"" | ".0" | ".1" | ".2" | ".3" | ".4" | ".5" | ".6" | ".7"}`
     V29: `2.29${"" | ".0" | ".1" | ".2"}`
@@ -59,6 +60,8 @@ export default function getMultiBlockSelectionPluginForVersion(version: EditorVe
         case '2.29.1':
         case '2.29.2':
             return MultiBlockSelectionPlugin_V2_29;
+        case '2.30':
+            return MultiBlockSelectionPlugin_V2_30
         default:
             if ((globalThis as any).Cypress)
                 return MultiBlockSelectionPlugin_V2_20to28;

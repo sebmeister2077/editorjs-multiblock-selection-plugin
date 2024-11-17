@@ -1,6 +1,7 @@
 import { MultiBlockSelectionPlugin_V2_20 } from "./versions/20";
 import { MultiBlockSelectionPlugin_V2_20to28 } from "./versions/21-28";
 import { MultiBlockSelectionPlugin_V2_29 } from "./versions/29";
+import { MultiBlockSelectionPlugin_V2_30 } from "./versions/30";
 export type EditorVersions = {
     V30: `2.30${"" | ".0" | ".1" | ".2" | ".3" | ".4" | ".5" | ".6" | ".7"}`;
     V29: `2.29${"" | ".0" | ".1" | ".2"}`;
@@ -14,4 +15,4 @@ export type EditorVersions = {
     V21: `2.21${"" | ".0"}`;
     V20: `2.20${"" | ".0"}`;
 };
-export default function getMultiBlockSelectionPluginForVersion(version: EditorVersions[keyof EditorVersions]): typeof MultiBlockSelectionPlugin_V2_29 | typeof MultiBlockSelectionPlugin_V2_20 | typeof MultiBlockSelectionPlugin_V2_20to28 | undefined;
+export default function getMultiBlockSelectionPluginForVersion(version: EditorVersions[keyof EditorVersions]): typeof MultiBlockSelectionPlugin_V2_20 | typeof MultiBlockSelectionPlugin_V2_20to28 | typeof MultiBlockSelectionPlugin_V2_29 | typeof MultiBlockSelectionPlugin_V2_30 | undefined;
