@@ -46,7 +46,8 @@ declare global {
         }
     }
     interface Window {
-        isEditorReady: Promise<void>
+        isEditorReady: Promise<void>;
+        editorVersion: string;
     }
 }
 
