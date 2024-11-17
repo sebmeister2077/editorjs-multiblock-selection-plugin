@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Test indent</title>
+        <script>
+            if (!globalThis.Cypress) {
+                document.writeln('<script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@2.26.5"><\/script>')
+                document.onload = () => {
+                    setTimeout(() => {
+                        window.dispatchEvent(new CustomEvent('can-load-editor', { detail: { version: '2.28' } }))
+                    }, 100)
+                }
+            } else {
+            }
+        </script>
+        <script src="
+https://cdn.jsdelivr.net/npm/@editorjs/header@2.8.7/dist/header.umd.min.js
+"></script>
+        <script src="
+https://cdn.jsdelivr.net/npm/@editorjs/list@1.10.0/dist/list.umd.min.js
+"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@editorjs/underline@1.1.0/dist/bundle.min.js"></script>
+
+        <script src="./dist/dev-build.js"></script>
+        <style>
+            .ce-block__content::before {
+                content: '';
+                width: 20px;
+                display: block;
+                height: 1.6em;
+                right: 100%;
+                top: 50%;
+                position: absolute;
+                transform: translate(0px, -50%);
+            }
+        </style>
+    </head>
+    <body>
+        <div id="editor" style="background-color: antiquewhite"></div>
+        <script>
+            setTimeout(() => {
+                const version = window.editorVersion
+                const MultiBlockSelectionPlugin = self.MultiBlockSelectionPlugin(version)
+
+                class ExtendedUnderline extends Underline {
+                    constructor(props) {
+                        super(props)
+
+                        this.selectedBlocks = []
+                        window.addEventListener(MultiBlockSelectionPlugin.SELECTION_EVENT_NAME, (ev) => {
+                            queueMicrotask(() => {
+                                this.selectedBlocks = ev.detail.selectedBlocks.slice()
+                            })
+                        })
+                    }
+
+                    surround(range) {
+                        if (!this.selectedBlocks.length) {
+                            super.surround(range)
+                            return
+                        }
+                        let isAppliedOnAllSelectedBlocks = true
+                        this.selectedBlocks.forEach(({ blockId, index }) => {
+                            const el = document.querySelector(`.codex-editor__redactor .ce-block:nth-child(${index + 1})`)
+                            if (!(el instanceof HTMLElement)) return
+
+                            const textEl = el.querySelector('[contenteditable=true]')
+                            if (!(textEl instanceof HTMLElement)) return
+                            const allText = el.textContent
+
+                            const firstBoldEl = textEl.querySelector('u')
+                            const isAppliedOnCurrentBlock = firstBoldEl && firstBoldEl.textContent == allText
+
+                            if (isAppliedOnCurrentBlock) return
+                            isAppliedOnAllSelectedBlocks = false
+                        })
+
+                        this.selectedBlocks.forEach(({ blockId, index }) => {
+                            const block = this.api.blocks.getById(blockId)
+                            if (!block) return
+
+                            const el = block.holder
+                            if (!(el instanceof HTMLElement)) return
+
+                            const textEl = el.querySelector('[contenteditable=true]')
+                            if (!(textEl instanceof HTMLElement)) return
+                            const allText = el.textContent
+
+                            const firstUnderlineEl = textEl.querySelector('u')
+                            const isAppliedOnCurrentBlock = firstUnderlineEl && firstUnderlineEl.textContent == allText
+                            const shouldRemove = isAppliedOnAllSelectedBlocks
+                            const shouldAdd = !isAppliedOnAllSelectedBlocks && !isAppliedOnCurrentBlock
+
+                            if (shouldRemove) {
+                                textEl.querySelectorAll('u').forEach((b) => b.replaceWith(...b.childNodes))
+
+                                return
+                            }
+
+                            if (!shouldAdd) return
+
+                            textEl.querySelectorAll('u').forEach((b) => b.replaceWith(...b.childNodes))
+
+                            const newUnderline = document.createElement('u')
+                            newUnderline.append(...textEl.childNodes)
+
+                            textEl.replaceChildren(newUnderline)
+                        })
+                    }
+                }
+                const dataLocation = 'editorjs-data-testing'
+
+                let data = {}
+                try {
+                    data = JSON.parse(localStorage.getItem(dataLocation))
+                    // console.log('🚀 ~ data:', data)
+                } catch {}
+                var editor = new EditorJS({
+                    holder: 'editor',
+                    tools: {
+                        underline: {
+                            class: ExtendedUnderline,
+                        },
+                        list: {
+                            class: self.List,
+                        },
+                        header: {
+                            class: self.Header,
+                        },
+                    },
+                    // readOnly: true,
+                    // onChange(api) {
+                    //     api.saver.save().then((data) => {
+                    //         localStorage.setItem(dataLocation, JSON.stringify(data))
+                    //     })
+                    // },
+                    data,
+                })
+
+                // console.log('🚀 ~ editor:', editor.configuration?.tools)
+                const blockSelection = new MultiBlockSelectionPlugin({
+                    editor,
+                })
+
+                window.isEditorReady = editor.isReady.then(() => {
+                    // console.log('🚀 ~ editor.isReady.then ~ editor:', editor)
+                    blockSelection.listen()
+                })
+            }, 300)
+        </script>
+    </body>
+</html>
