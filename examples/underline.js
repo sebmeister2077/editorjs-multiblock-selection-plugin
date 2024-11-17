@@ -1,27 +1,24 @@
 const MultiBlockSelectionPlugin = getMultiBlockSelectionPluginForVersion(EditorJS.version)
 
-// Editor v2.21-v2.28
+// Editor v2.21-v2.30
+
+// declare selected blocks outside of class + event listener
+let selectedBlocks = []
+window.addEventListener(MultiBlockSelectionPlugin.SELECTION_EVENT_NAME, (ev) => {
+    queueMicrotask(() => {
+        selectedBlocks = ev.detail.selectedBlocks.slice()
+    })
+})
 class ExtendedUnderline extends Underline {
     elementTagName = 'u'
-    constructor(props) {
-        super(props)
-
-        this.selectedBlocks = []
-        window.addEventListener(MultiBlockSelectionPlugin.SELECTION_EVENT_NAME, (ev) => {
-            queueMicrotask(() => {
-                this.selectedBlocks = ev.detail.selectedBlocks.slice()
-            })
-        })
-    }
 
     surround(range) {
-        if (!(range instanceof Range)) return
-        if (!this.selectedBlocks.length) {
+        if (!selectedBlocks.length) {
             super.surround(range)
             return
         }
         let isAppliedOnAllSelectedBlocks = true
-        this.selectedBlocks.forEach(({ blockId, index }) => {
+        selectedBlocks.forEach(({ blockId, index }) => {
             const el = document.querySelector(`.codex-editor__redactor .ce-block:nth-child(${index + 1})`)
             if (!(el instanceof HTMLElement)) return
 
@@ -36,7 +33,7 @@ class ExtendedUnderline extends Underline {
             isAppliedOnAllSelectedBlocks = false
         })
 
-        this.selectedBlocks.forEach(({ blockId, index }) => {
+        selectedBlocks.forEach(({ blockId, index }) => {
             const block = this.api.blocks.getById(blockId)
             if (!block) return
 
@@ -71,26 +68,17 @@ class ExtendedUnderline extends Underline {
 }
 
 // Editor v2.20
+
 class ExtendedUnderline extends Underline {
     elementTagName = 'u'
-    constructor(props) {
-        super(props)
-
-        this.selectedBlocks = []
-        window.addEventListener(MultiBlockSelectionPlugin.SELECTION_EVENT_NAME, (ev) => {
-            queueMicrotask(() => {
-                this.selectedBlocks = ev.detail.selectedBlocks.slice()
-            })
-        })
-    }
 
     surround(range) {
-        if (!this.selectedBlocks.length) {
+        if (!selectedBlocks.length) {
             super.surround(range)
             return
         }
         let isAppliedOnAllSelectedBlocks = true
-        this.selectedBlocks.forEach(({ index }) => {
+        selectedBlocks.forEach(({ index }) => {
             const el = document.querySelector(`.codex-editor__redactor .ce-block:nth-child(${index + 1})`)
             if (!(el instanceof HTMLElement)) return
 
@@ -105,7 +93,7 @@ class ExtendedUnderline extends Underline {
             isAppliedOnAllSelectedBlocks = false
         })
 
-        this.selectedBlocks.forEach(({ index }) => {
+        selectedBlocks.forEach(({ index }) => {
             const block = this.api.blocks.getBlockByIndex(index)
             if (!block) return
 

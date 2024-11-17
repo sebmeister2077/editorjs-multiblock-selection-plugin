@@ -1,26 +1,26 @@
 const MultiBlockSelectionPlugin = getMultiBlockSelectionPluginForVersion(EditorJS.version)
 
-// Editor v2.21-v2.28
+// declare selected blocks outside of class + event listener
+let selectedBlocks = []
+window.addEventListener(MultiBlockSelectionPlugin.SELECTION_EVENT_NAME, (ev) => {
+    queueMicrotask(() => {
+        selectedBlocks = ev.detail.selectedBlocks.slice()
+    })
+})
+
+// Editor v2.21-v2.30
 class Bold {
     elementTagName = 'b'
-    constructor() {
-        this.selectedBlocks = []
-        window.addEventListener(MultiBlockSelectionPlugin.SELECTION_EVENT_NAME, (ev) => {
-            queueMicrotask(() => {
-                this.selectedBlocks = ev.detail.selectedBlocks.slice()
-            })
-        })
-    }
+
     surround(range) {
-        if (!(range instanceof Range)) return
-        if (!this.selectedBlocks.length) {
-            // default implementation copied from internal code
+        if (!selectedBlocks.length) {
+            // default implementation copied from internal EditorJS code (idk which version anymore)
             document.execCommand(this.commandName)
             return
         }
 
         let isAppliedOnAllSelectedBlocks = true
-        this.selectedBlocks.forEach(({ blockId, index }) => {
+        selectedBlocks.forEach(({ blockId, index }) => {
             const el = document.querySelector(`.codex-editor__redactor .ce-block:nth-child(${index + 1})`)
             if (!(el instanceof HTMLElement)) return
 
@@ -35,7 +35,7 @@ class Bold {
             isAppliedOnAllSelectedBlocks = false
         })
 
-        this.selectedBlocks.forEach(({ blockId, index }) => {
+        selectedBlocks.forEach(({ blockId, index }) => {
             const el = document.querySelector(`.codex-editor__redactor .ce-block:nth-child(${index + 1})`)
             if (!(el instanceof HTMLElement)) return
 
@@ -68,24 +68,16 @@ class Bold {
 // Editor v2.20
 class Bold {
     elementTagName = 'b'
-    constructor() {
-        this.selectedBlocks = []
-        window.addEventListener(MultiBlockSelectionPlugin.SELECTION_EVENT_NAME, (ev) => {
-            queueMicrotask(() => {
-                this.selectedBlocks = ev.detail.selectedBlocks.slice()
-            })
-        })
-    }
+
     surround(range) {
-        if (!(range instanceof Range)) return
-        if (!this.selectedBlocks.length) {
+        if (!selectedBlocks.length) {
             // default implementation copied from internal code
             document.execCommand(this.commandName)
             return
         }
 
         let isAppliedOnAllSelectedBlocks = true
-        this.selectedBlocks.forEach(({ index }) => {
+        selectedBlocks.forEach(({ index }) => {
             const el = document.querySelector(`.codex-editor__redactor .ce-block:nth-child(${index + 1})`)
             if (!(el instanceof HTMLElement)) return
 
@@ -100,7 +92,7 @@ class Bold {
             isAppliedOnAllSelectedBlocks = false
         })
 
-        this.selectedBlocks.forEach(({ index }) => {
+        selectedBlocks.forEach(({ index }) => {
             const el = document.querySelector(`.codex-editor__redactor .ce-block:nth-child(${index + 1})`)
             if (!(el instanceof HTMLElement)) return
 
