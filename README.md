@@ -7,8 +7,9 @@ editor.isReady.then(() => {
 })
 ```
 
-You can find tool examples in the examples folder
+You can find tool examples in the /examples folder
 
 
 ## Working versions of EditorJS
-- v2.28
+- v2.20 to v2.30.7 have been verified to work
+
