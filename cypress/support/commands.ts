@@ -3,13 +3,15 @@ import editorData from '../fixtures/editorData.json'
 
 Cypress.Commands.add("applyEditorSelection", (startIndex: number, endIndex: number) => {
     const selectedBlockClass = "ce-block--selected"
-
+    const maxIndex = Math.max(startIndex, endIndex);
+    const minIndex = Math.min(startIndex, endIndex);
 
     function getBlockElementById(index: number) {
         return cy.get(`.codex-editor__redactor .ce-block:nth-child(${index + 1})`)
     }
 
-    cy.get(`.codex-editor__redactor .ce-block:nth-child(${startIndex + 1}) [contenteditable]`)
+    //? Important note, in the fixture please add more blocks than selected blocks so it works with v2.22 and down too
+    cy.get(`.codex-editor__redactor .ce-block:not(:nth-child(-n+${maxIndex + 1}):nth-child(n+${minIndex + 1})) [contenteditable]`)
         .trigger('mousedown')
         .then(($el) => {
             const el = $el[0]
