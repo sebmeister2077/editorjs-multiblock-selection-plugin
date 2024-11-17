@@ -15,6 +15,16 @@ export type EditorVersions = {
 
 export default function getMultiBlockSelectionPluginForVersion(version: EditorVersions[keyof EditorVersions]) {
     switch (version) {
+        case "2.23":
+        case "2.23.1":
+        case "2.23.2":
+        case "2.24":
+        case "2.24.0":
+        case "2.24.1":
+        case "2.24.2":
+        case "2.24.3":
+        case "2.25":
+        case "2.25.0":
         case "2.26":
         case "2.26.0":
         case "2.26.1":
@@ -32,7 +42,7 @@ export default function getMultiBlockSelectionPluginForVersion(version: EditorVe
         case "2.28.2":
             return MultiBlockSelectionPlugin_V2_28;
         default:
-            return MultiBlockSelectionPlugin_V2_28;
+            // return MultiBlockSelectionPlugin_V2_28;
             console.error("Given EditorJS version is not compatible with multiblock plugin")
     }
 }
