@@ -5,6 +5,9 @@ import EditorJS from '@editorjs/editorjs';
 import getMultiBlockSelectionPluginForVersion from 'editorjs-multiblock-selection-plugin'
 
 const MultiBlockSelectionPlugin = getMultiBlockSelectionPluginForVersion(EditorJS.version)
+
+// ... create your editor with config ...
+
 const blockSelection = new MultiBlockSelectionPlugin({ editor })
 editor.isReady.then(() => {
     blockSelection.listen()
