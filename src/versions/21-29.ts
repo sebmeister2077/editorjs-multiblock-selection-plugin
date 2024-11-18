@@ -17,12 +17,12 @@ export type ConstructorProps = {
     toolbarHiddenTimeoutMs?: number;
 }
 
-export class MultiBlockSelectionPlugin_V2_20to28 {
+export class MultiBlockSelectionPlugin_V2_20to29 {
     public static SELECTION_EVENT_NAME =
         "block-selection-changed"
 
     private onBeforeToolbarOpen: ConstructorProps['onBeforeToolbarOpen'];
-    private editor: EditorJs;
+    private editor: ConstructorProps['editor'];
     private toolbarHiddenTimeoutMs: ConstructorProps['toolbarHiddenTimeoutMs']
     private observer: MutationObserver;
     private selectedBlocks: SelectedBlock[] = [];
@@ -65,7 +65,7 @@ export class MultiBlockSelectionPlugin_V2_20to28 {
             if (!shouldDispatchEvent || this.isInlineOpen) return;
 
             window.dispatchEvent(
-                new CustomEvent(MultiBlockSelectionPlugin_V2_20to28.SELECTION_EVENT_NAME, {
+                new CustomEvent(MultiBlockSelectionPlugin_V2_20to29.SELECTION_EVENT_NAME, {
                     detail: { selectedBlocks: this.selectedBlocks },
                 })
             );
