@@ -239,16 +239,16 @@ export default class MultiBlockSelectionPlugin {
 
         // toolbar.style.left = `max(120px,${toolbar.style.left ?? "0px"})`
 
-        this.onBeforeToolbarOpen?.(toolbar)
-        this.isInlineOpen = true;
-        toolbar.classList.add(
-            this.EditorCSS.inlineToolbarShowed,
-        );
-
         window.addEventListener("click", this.globalClickListenerForToolbarClose.bind(this), { capture: true });
 
+        this.isInlineOpen = true;
+        this.onBeforeToolbarOpen?.(toolbar)
         if (this.isVersion30)
             this.verifyToolbarIsMountedWithItems();
+        else
+            toolbar.classList.add(
+                this.EditorCSS.inlineToolbarShowed,
+            );
     }
 
     private globalClickListenerForToolbarClose(e: MouseEvent) {

@@ -106,6 +106,7 @@ class ExtendedUnderline extends Underline {
 #### 4. Optionally remove tools from inline toolbar
 
 You can implement this however you want to hide unwanted tools in multi select mode
+Important note is that for version 2.30.x and up the CSS solution is recommended
 
 A javascript example:
 

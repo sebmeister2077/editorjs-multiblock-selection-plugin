@@ -50,7 +50,6 @@ https://cdn.jsdelivr.net/npm/@editorjs/list@1.10.0/dist/list.umd.min.js
                 let selectedBlocks = []
                 window.addEventListener(MultiBlockSelectionPlugin.SELECTION_CHANGE_EVENT, (ev) => {
                     selectedBlocks = ev.detail.selectedBlocks.slice()
-                    console.log(selectedBlocks)
                 })
 
                 class ExtendedUnderline extends Underline {
