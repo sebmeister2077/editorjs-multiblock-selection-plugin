@@ -20,13 +20,13 @@ export type ConstructorProps = {
      */
     onBeforeToolbarOpen?(toolbar: HTMLElement): void;
     /**
-    * This is used internally for hiding the toolbar, because toolbars dont have initially all its features rendered inside of it
-    * Increase value if toolbar glitching occurs when callins listen()
+    * This is used internally for hiding the toolbar, because toolbars dont have initially all its features rendered inside of it (version 2.29.x and up)
+    * Increase value if toolbar glitching occurs after calling listen()
     * @default 200
     */
     toolbarHiddenTimeoutMs?: number;
 };
-export declare class MultiBlockSelectionPlugin_V2_20to29 {
+export declare class MultiBlockSelectionPlugin {
     static SELECTION_EVENT_NAME: string;
     private onBeforeToolbarOpen;
     private editor;
@@ -40,8 +40,10 @@ export declare class MultiBlockSelectionPlugin_V2_20to29 {
     listen(): void;
     unlisten(): void;
     private get doBlocksHaveIds();
+    private get isVersion30();
     private get EditorCSS();
     private get CSS();
+    private syncSelectedBlocks;
     private initEditorListeners;
     private onRedactorMouseUp;
     private closeInlineToolbar;

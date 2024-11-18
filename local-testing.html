@@ -6,7 +6,7 @@
         <title>Test indent</title>
         <script>
             if (!globalThis.Cypress) {
-                window.editorVersion = '2.20'
+                window.editorVersion = '2.27'
                 document.writeln(
                     `<script onload="window.dispatchEvent(new CustomEvent('loadded-editorjs-script'));" src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@${window.editorVersion}"><\/script>`,
                 )
@@ -45,12 +45,13 @@ https://cdn.jsdelivr.net/npm/@editorjs/list@1.10.0/dist/list.umd.min.js
             }
             window.addEventListener('loadded-editorjs-script', () => {
                 const version = window.editorVersion
-                const MultiBlockSelectionPlugin = self.MultiBlockSelectionPlugin(version)
+                const MultiBlockSelectionPlugin = self.MultiBlockSelectionPlugin
 
                 let selectedBlocks = []
                 window.addEventListener(MultiBlockSelectionPlugin.SELECTION_EVENT_NAME, (ev) => {
                     queueMicrotask(() => {
                         selectedBlocks = ev.detail.selectedBlocks.slice()
+                        console.log(selectedBlocks)
                     })
                 })
 
@@ -63,7 +64,7 @@ https://cdn.jsdelivr.net/npm/@editorjs/list@1.10.0/dist/list.umd.min.js
                             return
                         }
                         let isAppliedOnAllSelectedBlocks = true
-                        selectedBlocks.forEach(({ index }) => {
+                        selectedBlocks.forEach(({ blockId, index }) => {
                             const el = document.querySelector(`.codex-editor__redactor .ce-block:nth-child(${index + 1})`)
                             if (!(el instanceof HTMLElement)) return
 
@@ -71,15 +72,15 @@ https://cdn.jsdelivr.net/npm/@editorjs/list@1.10.0/dist/list.umd.min.js
                             if (!(textEl instanceof HTMLElement)) return
                             const allText = el.textContent
 
-                            const firstBoldEl = textEl.querySelector('u')
+                            const firstBoldEl = textEl.querySelector(this.elementTagName)
                             const isAppliedOnCurrentBlock = firstBoldEl && firstBoldEl.textContent == allText
 
                             if (isAppliedOnCurrentBlock) return
                             isAppliedOnAllSelectedBlocks = false
                         })
 
-                        selectedBlocks.forEach(({ index }) => {
-                            const block = this.api.blocks.getBlockByIndex(index)
+                        selectedBlocks.forEach(({ blockId, index }) => {
+                            const block = this.api.blocks.getById(blockId)
                             if (!block) return
 
                             const el = block.holder
@@ -89,22 +90,22 @@ https://cdn.jsdelivr.net/npm/@editorjs/list@1.10.0/dist/list.umd.min.js
                             if (!(textEl instanceof HTMLElement)) return
                             const allText = el.textContent
 
-                            const firstUnderlineEl = textEl.querySelector('u')
+                            const firstUnderlineEl = textEl.querySelector(this.elementTagName)
                             const isAppliedOnCurrentBlock = firstUnderlineEl && firstUnderlineEl.textContent == allText
                             const shouldRemove = isAppliedOnAllSelectedBlocks
                             const shouldAdd = !isAppliedOnAllSelectedBlocks && !isAppliedOnCurrentBlock
 
                             if (shouldRemove) {
-                                textEl.querySelectorAll('u').forEach((b) => b.replaceWith(...b.childNodes))
+                                textEl.querySelectorAll(this.elementTagName).forEach((b) => b.replaceWith(...b.childNodes))
 
                                 return
                             }
 
                             if (!shouldAdd) return
 
-                            textEl.querySelectorAll('u').forEach((b) => b.replaceWith(...b.childNodes))
+                            textEl.querySelectorAll(this.elementTagName).forEach((b) => b.replaceWith(...b.childNodes))
 
-                            const newUnderline = document.createElement('u')
+                            const newUnderline = document.createElement(this.elementTagName)
                             newUnderline.append(...textEl.childNodes)
 
                             textEl.replaceChildren(newUnderline)
@@ -143,7 +144,7 @@ https://cdn.jsdelivr.net/npm/@editorjs/list@1.10.0/dist/list.umd.min.js
                 // console.log('🚀 ~ editor:', editor.configuration?.tools)
                 const blockSelection = new MultiBlockSelectionPlugin({
                     editor,
-                    editorVersion: EditorJS.version,
+                    version: EditorJS.version,
                 })
 
                 window.isEditorReady = editor.isReady.then(() => {
