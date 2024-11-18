@@ -103,6 +103,51 @@ class ExtendedUnderline extends Underline {
 }
 ```
 
+#### 4. Optionally remove tools from inline toolbar
+
+You can implement this however you want to hide unwanted tools in multi select mode
+
+A javascript example:
+
+```js
+new MultiBlockSelectionPlugin({
+    editor,
+    version: EditorJS.version,
+    onBeforeToolbarOpen(toolbar) {
+        const dropdown = toolbar.querySelector('.ce-inline-toolbar__dropdown')
+        if (dropdown instanceof HTMLElement) {
+            dropdown.style.display = 'none'
+        }
+        // show only underline
+        toolbar.querySelectorAll('[data-tool]:not([data-tool=underline])').forEach((el) => {
+            if (!(el instanceof HTMLElement)) return
+            el.style.display = 'none'
+        })
+    },
+    onAfterToolbarClose(toolbar) {
+        const dropdown = toolbar.querySelector('.ce-inline-toolbar__dropdown')
+        if (dropdown instanceof HTMLElement) {
+            dropdown.style.display = ''
+        }
+        toolbar.querySelectorAll('[data-tool]:not([data-tool=underline])').forEach((el) => {
+            if (!(el instanceof HTMLElement)) return
+            el.style.display = ''
+        })
+    },
+})
+```
+
+A CSS example:
+
+```css
+/* Editor has at least 2 blocks selected */
+.codex-editor:has(.ce-block--selected ~ .ce-block--selected) 
+/* Hide Dropdown converter and italic tool */
+:is(.ce-inline-toolbar__dropdown, [data-tool=italic]) {
+    display: none;
+}
+```
+
 Other examples can be found [here](https://github.com/sebmeister2077/editorjs-multiblock-selection-plugin/tree/main/examples)
 
 ## Working versions of EditorJS

@@ -144,6 +144,28 @@ https://cdn.jsdelivr.net/npm/@editorjs/list@1.10.0/dist/list.umd.min.js
                 const blockSelection = new MultiBlockSelectionPlugin({
                     editor,
                     version: EditorJS.version,
+                    onBeforeToolbarOpen(toolbar) {
+                        if (!(toolbar instanceof HTMLElement)) return
+                        const dropdown = toolbar.querySelector('.ce-inline-toolbar__dropdown')
+                        if (dropdown instanceof HTMLElement) {
+                            dropdown.style.display = 'none'
+                        }
+                        toolbar.querySelectorAll('[data-tool]:not([data-tool=underline])').forEach((el) => {
+                            if (!(el instanceof HTMLElement)) return
+                            el.style.display = 'none'
+                        })
+                    },
+                    onAfterToolbarClose(toolbar) {
+                        if (!(toolbar instanceof HTMLElement)) return
+                        const dropdown = toolbar.querySelector('.ce-inline-toolbar__dropdown')
+                        if (dropdown instanceof HTMLElement) {
+                            dropdown.style.display = ''
+                        }
+                        toolbar.querySelectorAll('[data-tool]:not([data-tool=underline])').forEach((el) => {
+                            if (!(el instanceof HTMLElement)) return
+                            el.style.display = ''
+                        })
+                    },
                 })
 
                 window.isEditorReady = editor.isReady.then(() => {

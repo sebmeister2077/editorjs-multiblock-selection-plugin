@@ -15,10 +15,17 @@ export type ConstructorProps = {
     version: string;
     editor: EditorJs;
     /**
-     * In case you want to hide some items from the toolbar
+     * Called right before the toolbar is showed
+     * Used to hide non working tools in multiselect mode
      * @param toolbar
      */
     onBeforeToolbarOpen?(toolbar: HTMLElement): void;
+    /**
+     * Called righ after the toolbar has closed
+     * Used to hide non working tools in multiselect mode
+     * @param toolbar
+     */
+    onAfterToolbarClose?(toolbar: HTMLElement): void;
     /**
     * This is used internally for hiding the toolbar, because toolbars dont have initially all its features rendered inside of it (version 2.29.x and up)
     * Increase value if toolbar glitching occurs after calling listen()
@@ -41,6 +48,7 @@ export type EditorVersions = {
 };
 export default class MultiBlockSelectionPlugin {
     static SELECTION_CHANGE_EVENT: string;
+    private onAfterToolbarClose;
     private onBeforeToolbarOpen;
     private editor;
     private editorVersion;
@@ -49,7 +57,7 @@ export default class MultiBlockSelectionPlugin {
     private selectedBlocks;
     private isInlineOpen;
     private redactorElement;
-    constructor({ editor, onBeforeToolbarOpen, version: editorVersion, toolbarHiddenTimeoutMs }: ConstructorProps);
+    constructor({ editor, onBeforeToolbarOpen, onAfterToolbarClose, version: editorVersion, toolbarHiddenTimeoutMs }: ConstructorProps);
     listen(): void;
     unlisten(): void;
     private get doBlocksHaveIds();

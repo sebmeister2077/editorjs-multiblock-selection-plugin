@@ -16,10 +16,17 @@ export type ConstructorProps = {
     version: string;
     editor: EditorJs,
     /**
-     * In case you want to hide some items from the toolbar
+     * Called right before the toolbar is showed
+     * Used to hide non working tools in multiselect mode
      * @param toolbar 
      */
     onBeforeToolbarOpen?(toolbar: HTMLElement): void;
+    /**
+     * Called righ after the toolbar has closed
+     * Used to hide non working tools in multiselect mode
+     * @param toolbar 
+     */
+    onAfterToolbarClose?(toolbar: HTMLElement): void;
     /**
     * This is used internally for hiding the toolbar, because toolbars dont have initially all its features rendered inside of it (version 2.29.x and up)
     * Increase value if toolbar glitching occurs after calling listen()
@@ -48,6 +55,7 @@ export default class MultiBlockSelectionPlugin {
     public static SELECTION_CHANGE_EVENT =
         "editorjs-block-selection-changed"
 
+    private onAfterToolbarClose: ConstructorProps['onAfterToolbarClose'];
     private onBeforeToolbarOpen: ConstructorProps['onBeforeToolbarOpen'];
     private editor: ConstructorProps['editor'];
     private editorVersion: ConstructorProps['version']
@@ -56,9 +64,10 @@ export default class MultiBlockSelectionPlugin {
     private selectedBlocks: SelectedBlock[] = [];
     private isInlineOpen = false;
     private redactorElement: HTMLElement | null = null;
-    constructor({ editor, onBeforeToolbarOpen, version: editorVersion, toolbarHiddenTimeoutMs = 200 }: ConstructorProps) {
+    constructor({ editor, onBeforeToolbarOpen, onAfterToolbarClose, version: editorVersion, toolbarHiddenTimeoutMs = 200 }: ConstructorProps) {
         this.editor = editor;
-        this.onBeforeToolbarOpen = onBeforeToolbarOpen
+        this.onBeforeToolbarOpen = onBeforeToolbarOpen;
+        this.onAfterToolbarClose = onAfterToolbarClose;
         this.toolbarHiddenTimeoutMs = toolbarHiddenTimeoutMs;
         this.editorVersion = editorVersion;
         if (!editorVersion)
@@ -188,9 +197,7 @@ export default class MultiBlockSelectionPlugin {
     private closeInlineToolbar() {
         if (!this.isInlineOpen) return;
         const toolbar = this.getInlineToolbar();
-        toolbar?.classList.remove(
-            this.EditorCSS.inlineToolbarShowed,
-        );
+        if (!toolbar) return;
 
         document
             .querySelectorAll(`.${this.CSS.blockSelected}`)
@@ -201,7 +208,11 @@ export default class MultiBlockSelectionPlugin {
 
         window.removeEventListener("click", this.globalClickListenerForToolbarClose.bind(this), { capture: true });
 
+        toolbar.classList.remove(
+            this.EditorCSS.inlineToolbarShowed,
+        );
         this.isInlineOpen = false;
+        this.onAfterToolbarClose?.(toolbar)
         this.selectedBlocks = [];
         this.syncSelectedBlocks();
     }
@@ -215,9 +226,7 @@ export default class MultiBlockSelectionPlugin {
             .querySelectorAll(`.${this.EditorCSS.selected}`)
             .forEach((el) => el.classList.add(this.CSS.blockSelected));
 
-        this.onBeforeToolbarOpen?.(toolbar)
 
-        this.isInlineOpen = true;
 
         const shouldAddPositionToToolbar = !toolbar.style.left || toolbar.style.left === "unset" || toolbar.style.left == "0px";
         if (shouldAddPositionToToolbar) {
@@ -229,6 +238,9 @@ export default class MultiBlockSelectionPlugin {
         }
 
         // toolbar.style.left = `max(120px,${toolbar.style.left ?? "0px"})`
+
+        this.onBeforeToolbarOpen?.(toolbar)
+        this.isInlineOpen = true;
         toolbar.classList.add(
             this.EditorCSS.inlineToolbarShowed,
         );
