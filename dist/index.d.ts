@@ -40,7 +40,7 @@ export type EditorVersions = {
     V20: `2.20${"" | ".0" | ".1" | ".2"}`;
 };
 export default class MultiBlockSelectionPlugin {
-    static SELECTION_EVENT_NAME: string;
+    static SELECTION_CHANGE_EVENT_NAME: string;
     private onBeforeToolbarOpen;
     private editor;
     private editorVersion;

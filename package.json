@@ -1,7 +1,7 @@
 {
     "name": "editorjs-multiblock-selection-plugin",
-    "version": "0.0.1",
-    "description": "Plugin to handle multiblock selection",
+    "version": "0.1.0",
+    "description": "Plugin to help extend multiblock selection functionality for your inline tools",
     "scripts": {
         "build": "webpack --mode production",
         "build:dev": "webpack --mode development --watch --output-filename=dev-build.js",
@@ -15,6 +15,22 @@
     ],
     "author": "sebmeister2077",
     "license": "MIT",
+    "keywords": [
+        "codex editor",
+        "tool",
+        "editor.js",
+        "editorjs",
+        "selection",
+        "multiblock"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/sebmeister2077/editorjs-multiblock-selection-plugin.git"
+    },
+    "bugs": {
+        "url": "https://github.com/sebmeister2077/editorjs-multiblock-selection-plugin/issues"
+    },
+    "homepage": "https://github.com/sebmeister2077/editorjs-multiblock-selection-plugin#readme",
     "devDependencies": {
         "@babel/core": "^7.25.2",
         "@babel/preset-env": "^7.25.4",
