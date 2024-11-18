@@ -45,7 +45,7 @@ type MakeValuesNever<T> = { [Key in keyof T]?: never };
 type XOR<T1, T2> = (T1 & MakeValuesNever<T2>) | (T2 & MakeValuesNever<T1>)
 
 export default class MultiBlockSelectionPlugin {
-    public static SELECTION_CHANGE_EVENT_NAME =
+    public static SELECTION_CHANGE_EVENT =
         "editorjs-block-selection-changed"
 
     private onBeforeToolbarOpen: ConstructorProps['onBeforeToolbarOpen'];
@@ -144,7 +144,7 @@ export default class MultiBlockSelectionPlugin {
 
     private syncSelectedBlocks() {
         window.dispatchEvent(
-            new CustomEvent(MultiBlockSelectionPlugin.SELECTION_CHANGE_EVENT_NAME, {
+            new CustomEvent(MultiBlockSelectionPlugin.SELECTION_CHANGE_EVENT, {
                 detail: { selectedBlocks: this.selectedBlocks },
             })
         );

@@ -3,9 +3,7 @@ const MultiBlockSelectionPlugin = getMultiBlockSelectionPluginForVersion(EditorJ
 // declare selected blocks outside of class + event listener
 let selectedBlocks = []
 window.addEventListener(MultiBlockSelectionPlugin.SELECTION_EVENT_NAME, (ev) => {
-    queueMicrotask(() => {
-        selectedBlocks = ev.detail.selectedBlocks.slice()
-    })
+    selectedBlocks = ev.detail.selectedBlocks.slice()
 })
 
 // Editor v2.21-v2.30
@@ -36,6 +34,9 @@ class Bold {
         })
 
         selectedBlocks.forEach(({ blockId, index }) => {
+            const block = this.api.blocks.getById(blockId)
+            if (!block) return
+
             const el = document.querySelector(`.codex-editor__redactor .ce-block:nth-child(${index + 1})`)
             if (!(el instanceof HTMLElement)) return
 
@@ -50,6 +51,8 @@ class Bold {
 
             if (shouldRemove) {
                 textEl.querySelectorAll(this.elementTagName).forEach((b) => b.replaceWith(...b.childNodes))
+                block.dispatchChange()
+
                 return
             }
 
@@ -61,6 +64,7 @@ class Bold {
             newBold.append(...textEl.childNodes)
 
             textEl.replaceChildren(newBold)
+            block.dispatchChange()
         })
     }
 }

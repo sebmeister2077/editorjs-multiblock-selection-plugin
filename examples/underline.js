@@ -5,10 +5,9 @@ const MultiBlockSelectionPlugin = getMultiBlockSelectionPluginForVersion(EditorJ
 // declare selected blocks outside of class + event listener
 let selectedBlocks = []
 window.addEventListener(MultiBlockSelectionPlugin.SELECTION_EVENT_NAME, (ev) => {
-    queueMicrotask(() => {
-        selectedBlocks = ev.detail.selectedBlocks.slice()
-    })
+    selectedBlocks = ev.detail.selectedBlocks.slice()
 })
+//@editorjs/underline
 class ExtendedUnderline extends Underline {
     elementTagName = 'u'
 
@@ -51,7 +50,7 @@ class ExtendedUnderline extends Underline {
 
             if (shouldRemove) {
                 textEl.querySelectorAll(this.elementTagName).forEach((b) => b.replaceWith(...b.childNodes))
-
+                block.dispatchChange()
                 return
             }
 
@@ -63,6 +62,7 @@ class ExtendedUnderline extends Underline {
             newUnderline.append(...textEl.childNodes)
 
             textEl.replaceChildren(newUnderline)
+            block.dispatchChange()
         })
     }
 }
@@ -111,7 +111,7 @@ class ExtendedUnderline extends Underline {
 
             if (shouldRemove) {
                 textEl.querySelectorAll('u').forEach((b) => b.replaceWith(...b.childNodes))
-
+                block.dispatchChange()
                 return
             }
 
@@ -123,6 +123,7 @@ class ExtendedUnderline extends Underline {
             newUnderline.append(...textEl.childNodes)
 
             textEl.replaceChildren(newUnderline)
+            block.dispatchChange()
         })
     }
 }
