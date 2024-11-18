@@ -1,8 +1,19 @@
 import EditorJs from "@editorjs/editorjs";
 import "../index.css";
 
-export type SelectedBlock = { index: number, isFirstSelected?: boolean };
+export type SelectedBlock = {
+    /**
+     * Guaranteed to exist only from version 2.21.x and above
+     */
+    blockId?: string;
+    index: number;
+    isFirstSelected?: boolean
+};
 export type ConstructorProps = {
+    /**
+     * Pass EditorJS.version value
+     */
+    editorVersion: string;
     editor: EditorJs,
     /**
      * In case you want to hide some items from the toolbar
@@ -17,21 +28,29 @@ export type ConstructorProps = {
     toolbarHiddenTimeoutMs?: number;
 }
 
-export class MultiBlockSelectionPlugin_V2_20 {
+type MakeValuesNever<T> = { [Key in keyof T]?: never };
+type XOR<T1, T2> = (T1 & MakeValuesNever<T2>) | (T2 & MakeValuesNever<T1>)
+
+export class MultiBlockSelectionPlugin_V2_20to29 {
     public static SELECTION_EVENT_NAME =
         "block-selection-changed"
 
     private onBeforeToolbarOpen: ConstructorProps['onBeforeToolbarOpen'];
-    private editor: EditorJs;
+    private editor: ConstructorProps['editor'];
+    private editorVersion: ConstructorProps['editorVersion']
     private toolbarHiddenTimeoutMs: ConstructorProps['toolbarHiddenTimeoutMs']
     private observer: MutationObserver;
     private selectedBlocks: SelectedBlock[] = [];
     private isInlineOpen = false;
     private redactorElement: HTMLElement | null = null;
-    constructor({ editor, onBeforeToolbarOpen, toolbarHiddenTimeoutMs = 200 }: ConstructorProps) {
+    constructor({ editor, onBeforeToolbarOpen, editorVersion, toolbarHiddenTimeoutMs = 200 }: ConstructorProps) {
         this.editor = editor;
         this.onBeforeToolbarOpen = onBeforeToolbarOpen
-        this.toolbarHiddenTimeoutMs = toolbarHiddenTimeoutMs
+        this.toolbarHiddenTimeoutMs = toolbarHiddenTimeoutMs;
+        this.editorVersion = editorVersion;
+        if (!editorVersion)
+            console.error("Missing editorVersion parameter might make Multiselect Plugin to not work properly")
+
 
         //needed for block level selections
         this.observer = new MutationObserver((mutations) => {
@@ -40,34 +59,34 @@ export class MultiBlockSelectionPlugin_V2_20 {
                 if (mutation.type !== "attributes" || !(mutation.target instanceof HTMLElement)) return;
 
                 const { target } = mutation;
-                const blockIndex = this.getBlockIndexForElement(target);
-                if (blockIndex === null) return
+                const blockData = this.getBlockIdAndIndexForElement(target);
+                const { blockId, blockIndex } = blockData
+                if (!blockId && blockIndex == null) return
 
-                const block = this.editor.blocks.getBlockByIndex(blockIndex)
+                const block = this.editor.blocks.getById?.(blockId ?? "") || (blockIndex ? this.editor.blocks.getBlockByIndex(blockIndex) : undefined);
                 if (!block) return;
 
                 const isSelected = block.selected || target.classList.contains(this.EditorCSS.selected);
-                const isAlreadySelected = this.selectedBlocks.some(({ index }) => index === blockIndex);
+                const isAlreadySelected = this.selectedBlocks.some(({ blockId, index }) => this.doBlocksHaveIds ? blockId === block.id : index === blockIndex);
                 if (isSelected == isAlreadySelected) return;
-
-
 
                 shouldDispatchEvent = true;
                 const index = Array.from(target.parentElement?.children ?? []).indexOf(target);
                 if (isSelected) {
-                    const selectionData: SelectedBlock = { index };
+                    const selectionData: SelectedBlock = { blockId: block.id, index };
                     if (this.selectedBlocks.length === 0)
                         selectionData.isFirstSelected = true;
                     this.selectedBlocks.push(selectionData);
                 } else {
-                    this.selectedBlocks = this.selectedBlocks.filter(({ index }) => index !== blockIndex);
+                    this.selectedBlocks = this.selectedBlocks.filter(({ blockId, index }) => this.doBlocksHaveIds ? blockId !== block.id : index !== blockIndex);
                 }
+
             });
 
             if (!shouldDispatchEvent || this.isInlineOpen) return;
 
             window.dispatchEvent(
-                new CustomEvent(MultiBlockSelectionPlugin_V2_20.SELECTION_EVENT_NAME, {
+                new CustomEvent(MultiBlockSelectionPlugin_V2_20to29.SELECTION_EVENT_NAME, {
                     detail: { selectedBlocks: this.selectedBlocks },
                 })
             );
@@ -77,13 +96,16 @@ export class MultiBlockSelectionPlugin_V2_20 {
     public listen() {
         this.initEditorListeners();
         this.verifyToolbarIsMountedWithItems();
-
     }
 
     public unlisten() {
         this.observer?.disconnect();
         this.redactorElement?.removeEventListener("mouseup", this.onRedactorMouseUp);
         this.redactorElement = null;
+    }
+
+    private get doBlocksHaveIds() {
+        return this.editorVersion >= "2.21";
     }
 
     private get EditorCSS() {
@@ -134,8 +156,8 @@ export class MultiBlockSelectionPlugin_V2_20 {
         const lastSelectedElement = [...this.selectedBlocks].sort(sortByIndex).reverse()[0];
         if (!lastSelectedElement) return;
 
-        const { index } = lastSelectedElement;
-        const el = this.getDOMBlockByIdx(index);
+        const { blockId, index } = lastSelectedElement;
+        const el = this.getDOMBlockByIdOrIdx(blockId, index);
         if (!el) return;
 
         this.openInlineToolbar();
@@ -181,10 +203,9 @@ export class MultiBlockSelectionPlugin_V2_20 {
         toolbar.classList.add(
             this.EditorCSS.inlineToolbarShowed,
         );
+
         window.addEventListener("click", this.globalClickListenerForToolbarClose.bind(this), { capture: true });
-
     }
-
 
     private globalClickListenerForToolbarClose(e: MouseEvent) {
         if (!this.isInlineOpen) return;
@@ -204,7 +225,7 @@ export class MultiBlockSelectionPlugin_V2_20 {
         const isEmpty = buttonsContainer.childElementCount === 0;
         if (!isEmpty) return;
 
-        const blockEl = this.getDOMBlockByIdx(0);
+        const blockEl = this.getDOMBlockByIdOrIdx(undefined, 0);
         const editableElement = blockEl?.querySelector("[contenteditable]")
         if (!(editableElement instanceof HTMLElement)) return;
 
@@ -238,13 +259,35 @@ export class MultiBlockSelectionPlugin_V2_20 {
     }
 
     // handle multiple editorjs versions..
-    private getBlockIndexForElement(target: HTMLElement): number | null {
+    private getBlockIdAndIndexForElement(target: HTMLElement): XOR<{ blockId: string | null }, { blockIndex: number | null }> {
+        let blockId = target.getAttribute("data-id");
+        if (blockId) return { blockId };
+
+        blockId = this.editor.blocks
+            //@ts-ignore
+            .getBlockByElement?.(target)?.id ?? null;
+        if (blockId) return { blockId };
+
         const blockIndex = Array.from(target.parentElement?.children ?? []).indexOf(target);
-        return blockIndex === -1 ? null : blockIndex;
+        if (blockIndex === -1)
+            return { blockId: null };
+
+        blockId = this.editor.blocks.getBlockByIndex(blockIndex)?.id ?? null;
+        if (blockId)
+            return { blockId };
+        return { blockIndex }
     }
 
-    private getDOMBlockByIdx(index: number) {
-        let block = this.redactorElement?.querySelector(`.${this.EditorCSS.block}:nth-child(${index + 1})`) ?? null;
+    private getDOMBlockByIdOrIdx(blockId: string | undefined, index: number) {
+        let block: HTMLElement | null = null;
+        if (blockId)
+            block = this.editor.blocks.getById(blockId)?.holder ?? null;
+        if ((block instanceof HTMLElement)) return block;
+
+        block = this.redactorElement?.querySelector(`.${this.EditorCSS.block}[data-id='${blockId}']`) ?? null;
+        if ((block instanceof HTMLElement)) return block;
+
+        block = this.redactorElement?.querySelector(`.${this.EditorCSS.block}:nth-child(${index + 1})`) ?? null;
         if ((block instanceof HTMLElement)) return block;
         return null;
     }
@@ -264,6 +307,7 @@ export class MultiBlockSelectionPlugin_V2_20 {
         return contentEl.getBoundingClientRect().left - anyBlockEl.getBoundingClientRect().left
     }
 
+    // and up probably..
     private getToolbarPositionFor2_28_1Version() {
         const firstSelectedBlockData = this.selectedBlocks.find(d => d.isFirstSelected);
         if (!firstSelectedBlockData) return null;
@@ -275,7 +319,7 @@ export class MultiBlockSelectionPlugin_V2_20 {
         left = Math.round(left);
         left += 16;// margin
 
-        const blockEl = this.getDOMBlockByIdx(firstSelectedBlockData.index)
+        const blockEl = this.getDOMBlockByIdOrIdx(firstSelectedBlockData.blockId, firstSelectedBlockData.index)
         const redactorTop = this.redactorElement?.getBoundingClientRect().top
         if (!blockEl || redactorTop === undefined) return { left };
 

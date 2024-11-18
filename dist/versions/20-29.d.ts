@@ -1,11 +1,18 @@
 import EditorJs from "@editorjs/editorjs";
 import "../index.css";
 export type SelectedBlock = {
-    blockId: string;
+    /**
+     * Guaranteed to exist only from version 2.21.x and above
+     */
+    blockId?: string;
     index: number;
     isFirstSelected?: boolean;
 };
 export type ConstructorProps = {
+    /**
+     * Pass EditorJS.version value
+     */
+    editorVersion: string;
     editor: EditorJs;
     /**
      * In case you want to hide some items from the toolbar
@@ -13,24 +20,26 @@ export type ConstructorProps = {
      */
     onBeforeToolbarOpen?(toolbar: HTMLElement): void;
     /**
-     * This is used internally for hiding the toolbar for versions 2.29 because toolbars dont have initially all its features rendered inside of it
-     * Increase value if toolbar glitching occurs when callins listen()
-     * @default 200
-     */
+    * This is used internally for hiding the toolbar, because toolbars dont have initially all its features rendered inside of it
+    * Increase value if toolbar glitching occurs when callins listen()
+    * @default 200
+    */
     toolbarHiddenTimeoutMs?: number;
 };
-export declare class MultiBlockSelectionPlugin_V2_29 {
+export declare class MultiBlockSelectionPlugin_V2_20to29 {
     static SELECTION_EVENT_NAME: string;
     private onBeforeToolbarOpen;
     private editor;
+    private editorVersion;
     private toolbarHiddenTimeoutMs;
     private observer;
     private selectedBlocks;
     private isInlineOpen;
     private redactorElement;
-    constructor({ editor, onBeforeToolbarOpen, toolbarHiddenTimeoutMs }: ConstructorProps);
+    constructor({ editor, onBeforeToolbarOpen, editorVersion, toolbarHiddenTimeoutMs }: ConstructorProps);
     listen(): void;
     unlisten(): void;
+    private get doBlocksHaveIds();
     private get EditorCSS();
     private get CSS();
     private initEditorListeners;
@@ -39,7 +48,7 @@ export declare class MultiBlockSelectionPlugin_V2_29 {
     private openInlineToolbar;
     private globalClickListenerForToolbarClose;
     private verifyToolbarIsMountedWithItems;
-    private getBlockIdForElement;
+    private getBlockIdAndIndexForElement;
     private getDOMBlockByIdOrIdx;
     private getInlineToolbar;
     private getLeftDistanceForToolbar;

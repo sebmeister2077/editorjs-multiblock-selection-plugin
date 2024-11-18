@@ -48,16 +48,14 @@ https://cdn.jsdelivr.net/npm/@editorjs/list@1.10.0/dist/list.umd.min.js
                 const MultiBlockSelectionPlugin = self.MultiBlockSelectionPlugin(version)
 
                 let selectedBlocks = []
-                class ExtendedUnderline extends Underline {
-                    constructor(props) {
-                        super(props)
+                window.addEventListener(MultiBlockSelectionPlugin.SELECTION_EVENT_NAME, (ev) => {
+                    queueMicrotask(() => {
+                        selectedBlocks = ev.detail.selectedBlocks.slice()
+                    })
+                })
 
-                        window.addEventListener(MultiBlockSelectionPlugin.SELECTION_EVENT_NAME, (ev) => {
-                            queueMicrotask(() => {
-                                selectedBlocks = ev.detail.selectedBlocks.slice()
-                            })
-                        })
-                    }
+                class ExtendedUnderline extends Underline {
+                    elementTagName = 'u'
 
                     surround(range) {
                         if (!selectedBlocks.length) {
@@ -145,6 +143,7 @@ https://cdn.jsdelivr.net/npm/@editorjs/list@1.10.0/dist/list.umd.min.js
                 // console.log('🚀 ~ editor:', editor.configuration?.tools)
                 const blockSelection = new MultiBlockSelectionPlugin({
                     editor,
+                    editorVersion: EditorJS.version,
                 })
 
                 window.isEditorReady = editor.isReady.then(() => {
