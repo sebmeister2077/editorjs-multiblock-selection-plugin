@@ -165,4 +165,4 @@ Other examples can be found [here](https://github.com/sebmeister2077/editorjs-mu
 
 ## Working versions of EditorJS
 
--   v2.20 to v2.30.7 have been verified to work
+-   v2.18 to v2.30.7 have been verified to work
