@@ -6,7 +6,7 @@
         <title>Test indent</title>
         <script>
             if (!globalThis.Cypress) {
-                window.editorVersion = '2.30'
+                window.editorVersion = '2.28'
                 document.writeln(
                     `<script onload="window.dispatchEvent(new CustomEvent('loadded-editorjs-script'));" src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@${window.editorVersion}"><\/script>`,
                 )
@@ -81,7 +81,7 @@ https://cdn.jsdelivr.net/npm/@editorjs/list@1.10.0/dist/list.umd.min.js
                         })
 
                         selectedBlocks.forEach(({ blockId, index }) => {
-                            const block = this.api.blocks.getById(blockId)
+                            const block = this.api.blocks.getBlockByIndex(index)
                             if (!block) return
 
                             const el = block.holder
@@ -98,7 +98,7 @@ https://cdn.jsdelivr.net/npm/@editorjs/list@1.10.0/dist/list.umd.min.js
 
                             if (shouldRemove) {
                                 textEl.querySelectorAll(this.elementTagName).forEach((b) => b.replaceWith(...b.childNodes))
-                                block.dispatchChange()
+                                block.dispatchChange?.()
                                 return
                             }
 
@@ -110,7 +110,7 @@ https://cdn.jsdelivr.net/npm/@editorjs/list@1.10.0/dist/list.umd.min.js
                             newUnderline.append(...textEl.childNodes)
 
                             textEl.replaceChildren(newUnderline)
-                            block.dispatchChange()
+                            block.dispatchChange?.()
                         })
                     }
                 }
@@ -149,12 +149,26 @@ https://cdn.jsdelivr.net/npm/@editorjs/list@1.10.0/dist/list.umd.min.js
                     version: EditorJS.version,
                     onBeforeToolbarOpen(toolbar) {
                         if (!(toolbar instanceof HTMLElement)) return
-
+                        const dropdown = toolbar.querySelector('.ce-inline-toolbar__dropdown')
+                        if (dropdown instanceof HTMLElement) {
+                            dropdown.style.display = 'none'
+                        }
+                        toolbar.querySelectorAll('[data-tool]:not([data-tool=underline])').forEach((el) => {
+                            if (!(el instanceof HTMLElement)) return
+                            el.style.display = 'none'
+                        })
                         toolbar.classList.add('toolbarIsOpen')
                     },
                     onAfterToolbarClose(toolbar) {
                         if (!(toolbar instanceof HTMLElement)) return
-
+                        const dropdown = toolbar.querySelector('.ce-inline-toolbar__dropdown')
+                        if (dropdown instanceof HTMLElement) {
+                            dropdown.style.display = ''
+                        }
+                        toolbar.querySelectorAll('[data-tool]:not([data-tool=underline])').forEach((el) => {
+                            if (!(el instanceof HTMLElement)) return
+                            el.style.display = ''
+                        })
                         setTimeout(() => {
                             toolbar.classList.remove('toolbarIsOpen')
                         }, 250)
