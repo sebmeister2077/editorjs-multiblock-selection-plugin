@@ -106,7 +106,6 @@ class ExtendedUnderline extends Underline {
 #### 4. Optionally remove tools from inline toolbar
 
 You can implement this however you want to hide unwanted tools in multi select mode
-Important note is that for version 2.30.x and up the CSS solution is recommended
 
 A javascript example:
 
@@ -138,15 +137,28 @@ new MultiBlockSelectionPlugin({
 })
 ```
 
-A CSS example:
+A CSS+JS example:
 
 ```css
-/* Editor has at least 2 blocks selected */
-.codex-editor:has(.ce-block--selected ~ .ce-block--selected) 
-/* Hide Dropdown converter and italic tool */
-:is(.ce-inline-toolbar__dropdown, [data-tool=italic]) {
+.toolbarIsOpen [data-item-name='convert-to'] {
     display: none;
 }
+```
+
+```js
+onBeforeToolbarOpen(toolbar) {
+    if (!(toolbar instanceof HTMLElement)) return
+
+    toolbar.classList.add('toolbarIsOpen')
+},
+onAfterToolbarClose(toolbar) {
+    if (!(toolbar instanceof HTMLElement)) return
+
+    // timeout is needed because toolbar closes using a transition
+    setTimeout(() => {
+        toolbar.classList.remove('toolbarIsOpen')
+    }, 250)
+},
 ```
 
 Other examples can be found [here](https://github.com/sebmeister2077/editorjs-multiblock-selection-plugin/tree/main/examples)

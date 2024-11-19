@@ -2,25 +2,6 @@
     background-color: #e1f2ff;
 }
 
-/* Editor has at least 2 blocks selected
-.codex-editor:not(:has(.ce-custom-block-selection ~ .ce-custom-block-selection))
-
-:is([data-item-name=convert-to]) {
-    animation: displayNoneAnimation -1s 1s forwards;
-    -webkit-animation: displayNoneAnimation -1s 1s forwards;
-}
-
-@keyframes displayNoneAnimation {
-    0% {
-        display: block;
-    }
-
-    10%,
-    95% {
-        display: none;
-    }
-} */
-
 .temporary-toolbar-selected {
     max-height: 0px;
     max-width: 0px;
