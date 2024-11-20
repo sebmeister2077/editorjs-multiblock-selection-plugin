@@ -34,11 +34,6 @@ jobs:
                   echo "HTML is being hosted temporarily on http://localhost:5000"
               working-directory: ./ # Adjust if your HTML file is in a subfolder
 
-            - name: Wait and Display URL
-              run: |
-                  echo "The server will run for 5 minutes. Visit http://localhost:5000 to view your file."
-                  sleep 300
-
             - name: Run Cypress Tests
               run: npx cypress run
               env:
