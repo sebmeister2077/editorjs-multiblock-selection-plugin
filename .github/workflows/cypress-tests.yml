@@ -28,13 +28,12 @@ jobs:
             - name: Build js bundle file
               run: webpack --mode development --output-filename=dev-build.js
 
-            - name: Start HTTP Server
+            - name: Start HTTP Server & Run Cypress Tests
               run: |
-                  python3 -m http.server 5000 &
+                  python3 -m http.server 5000 & 
+                  npx cypress run &
                   echo "HTML is being hosted temporarily on http://127.0.0.1:5500"
               working-directory: ./ # Adjust if your HTML file is in a subfolder
-
-            - name: Run Cypress Tests
-              run: npx cypress run
               env:
                   CYPRESS_BASE_URL: http://127.0.0.1:5500 # Set the base URL if needed
+
