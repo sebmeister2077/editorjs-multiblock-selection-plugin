@@ -17,10 +17,11 @@ jobs:
             - name: Set up Node.js
               uses: actions/setup-node@v3
               with:
-                  node-version: 16 # Use the version compatible with your project
+                  node-version: 18 # Use the version compatible with your project
 
-            - name: Install Dependencies
-              run: npm install
+            # In case i will have dependencies in the future
+            # - name: Install Dependencies
+            #   run: npm install
 
             - name: Install Python (for the HTTP server)
               run: sudo apt-get install -y python3
@@ -31,10 +32,10 @@ jobs:
             - name: Start HTTP Server
               run: |
                   python3 -m http.server 5000 &
-                  echo "HTML is being hosted temporarily on http://localhost:5000"
+                  echo "HTML is being hosted temporarily on http://127.0.0.1:5500"
               working-directory: ./ # Adjust if your HTML file is in a subfolder
 
             - name: Run Cypress Tests
               run: npx cypress run
               env:
-                  CYPRESS_BASE_URL: http://localhost:5000 # Set the base URL if needed
+                  CYPRESS_BASE_URL: http://127.0.0.1:5500 # Set the base URL if needed
