@@ -30,9 +30,10 @@ jobs:
 
             - name: Start HTTP Server & Run Cypress Tests
               run: |
-                  python3 -m http.server 5000 & 
+                  python3 -m http.server http://127.0.0.1:5500 & 
+                  sleep 15 &
+                  echo "HTML is being hosted temporarily on http://127.0.0.1:5500" &
                   npx cypress run &
-                  echo "HTML is being hosted temporarily on http://127.0.0.1:5500" sleep 300
               working-directory: ./ # Adjust if your HTML file is in a subfolder
               env:
                   CYPRESS_BASE_URL: http://127.0.0.1:5500 # Set the base URL if needed
