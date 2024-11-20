@@ -1,0 +1,45 @@
+name: Cypress Tests
+
+on:
+    workflow_dispatch:# Allow manual triggering of the workflow
+        # pull_request: # Run on pull requests
+        #     branches:
+        #         - main
+
+jobs:
+    cypress:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v3
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 16 # Use the version compatible with your project
+
+            - name: Install Dependencies
+              run: npm install
+
+            - name: Install Python (for the HTTP server)
+              run: sudo apt-get install -y python3
+
+            - name: Build js bundle file
+              run: webpack --mode development --output-filename=dev-build.js
+
+            - name: Start HTTP Server
+              run: |
+                  python3 -m http.server 5000 &
+                  echo "HTML is being hosted temporarily on http://localhost:5000"
+              working-directory: ./ # Adjust if your HTML file is in a subfolder
+
+            - name: Wait and Display URL
+              run: |
+                  echo "The server will run for 5 minutes. Visit http://localhost:5000 to view your file."
+                  sleep 300
+
+            - name: Run Cypress Tests
+              run: npx cypress run
+              env:
+                  CYPRESS_BASE_URL: http://localhost:5000 # Set the base URL if needed
