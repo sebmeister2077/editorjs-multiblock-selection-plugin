@@ -19,9 +19,8 @@ jobs:
               with:
                   node-version: 18 # Use the version compatible with your project
 
-            # In case i will have dependencies in the future
-            # - name: Install Dependencies
-            #   run: npm install
+            - name: Install Dependencies
+              run: npm install
 
             - name: Install Python (for the HTTP server)
               run: sudo apt-get install -y python3
