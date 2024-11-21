@@ -1,6 +1,12 @@
 import EditorJs from "@editorjs/editorjs";
 import "./index.css";
 
+
+
+
+
+
+
 export type SelectedBlock = {
     /**
      * Guaranteed to exist only from version 2.21.x and above
