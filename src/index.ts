@@ -113,7 +113,7 @@ export default class MultiBlockSelectionPlugin {
 
     public listen() {
         this.initEditorListeners();
-        if (!this.isVersion30)
+        if (!this.isVersion30andUp)
             this.verifyToolbarIsMountedWithItems();
     }
 
@@ -127,8 +127,8 @@ export default class MultiBlockSelectionPlugin {
         return this.editorVersion >= "2.21";
     }
 
-    private get isVersion30() {
-        return this.editorVersion.startsWith("2.30");
+    private get isVersion30andUp() {
+        return /2.3[\d]/.test(this.editorVersion)
     }
 
     private get EditorCSS() {
@@ -140,7 +140,7 @@ export default class MultiBlockSelectionPlugin {
             inlineToolbar: "ce-inline-toolbar",
             inlineToolbarButtons: "ce-inline-toolbar__buttons",
             inlineToolbarShowed: "ce-inline-toolbar--showed",
-        };
+        } as const;
     }
 
     private get CSS() {
@@ -202,7 +202,7 @@ export default class MultiBlockSelectionPlugin {
         document
             .querySelectorAll(`.${this.CSS.blockSelected}`)
             .forEach((el) => el.classList.remove(this.CSS.blockSelected));
-        if (this.isVersion30)
+        if (this.isVersion30andUp)
             document.querySelectorAll(`.${this.CSS.temporaryBlockSelected}`)
                 .forEach(el => el.classList.remove(this.CSS.temporaryBlockSelected))
 
@@ -243,7 +243,7 @@ export default class MultiBlockSelectionPlugin {
 
         this.isInlineOpen = true;
         this.onBeforeToolbarOpen?.(toolbar)
-        if (this.isVersion30)
+        if (this.isVersion30andUp)
             this.verifyToolbarIsMountedWithItems();
         else
             toolbar.classList.add(
@@ -266,7 +266,7 @@ export default class MultiBlockSelectionPlugin {
         let isEmpty = toolbar.childElementCount === 0;
         let elementNeededToObserve = toolbar;
 
-        if (!this.isVersion30) {
+        if (!this.isVersion30andUp) {
             const buttonsContainer = toolbar.querySelector(`.${this.EditorCSS.inlineToolbarButtons}`)
             if (!(buttonsContainer instanceof HTMLElement)) return;
 
@@ -277,7 +277,7 @@ export default class MultiBlockSelectionPlugin {
 
         let blockId: string | undefined = undefined;
         let blockIndex = 0;
-        if (this.isVersion30) {
+        if (this.isVersion30andUp) {
             const firstSelectedBlockData = this.selectedBlocks.find(b => b.isFirstSelected);
             if (!firstSelectedBlockData) return;
             blockId = firstSelectedBlockData.blockId;
@@ -294,7 +294,7 @@ export default class MultiBlockSelectionPlugin {
         const range = document.createRange();
         range.selectNodeContents(editableElement)
 
-        if (!this.isVersion30)
+        if (!this.isVersion30andUp)
             toolbar.classList.add(this.CSS.temporaryToolbarSelected)
         editableElement.classList.add(this.CSS.temporaryBlockSelected)
 
@@ -305,7 +305,7 @@ export default class MultiBlockSelectionPlugin {
             e.stopPropagation();
         }
 
-        if (this.isVersion30) {
+        if (this.isVersion30andUp) {
             editableElement.classList.add(this.CSS.temporaryBlockSelected)
             this.editor.inlineToolbar.open();
             window.addEventListener("selectionchange", stopSelectionChangeListener, {

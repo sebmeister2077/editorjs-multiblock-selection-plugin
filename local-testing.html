@@ -6,7 +6,7 @@
         <title>Test indent</title>
         <script>
             if (!globalThis.Cypress) {
-                window.editorVersion = '2.19.3'
+                window.editorVersion = '2.30.8'
                 document.writeln(
                     `<script onload="window.dispatchEvent(new CustomEvent('loadded-editorjs-script'));" src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@${window.editorVersion}"><\/script>`,
                 )
@@ -65,6 +65,7 @@ https://cdn.jsdelivr.net/npm/@editorjs/list@1.10.0/dist/list.umd.min.js
                             return
                         }
                         let isAppliedOnAllSelectedBlocks = true
+                        // verify if it is applied to all selected blocks
                         selectedBlocks.forEach(({ blockId, index }) => {
                             const el = document.querySelector(`.codex-editor__redactor .ce-block:nth-child(${index + 1})`)
                             if (!(el instanceof HTMLElement)) return
@@ -81,7 +82,8 @@ https://cdn.jsdelivr.net/npm/@editorjs/list@1.10.0/dist/list.umd.min.js
                         })
 
                         selectedBlocks.forEach(({ blockId, index }) => {
-                            const block = this.api.blocks.getBlockByIndex(index)
+                            // depending on your editor version you might have to use getByIndex();
+                            const block = this.api.blocks.getById(blockId)
                             if (!block) return
 
                             const el = block.holder
@@ -98,7 +100,7 @@ https://cdn.jsdelivr.net/npm/@editorjs/list@1.10.0/dist/list.umd.min.js
 
                             if (shouldRemove) {
                                 textEl.querySelectorAll(this.elementTagName).forEach((b) => b.replaceWith(...b.childNodes))
-                                block.dispatchChange?.()
+                                block.dispatchChange()
                                 return
                             }
 
@@ -110,7 +112,7 @@ https://cdn.jsdelivr.net/npm/@editorjs/list@1.10.0/dist/list.umd.min.js
                             newUnderline.append(...textEl.childNodes)
 
                             textEl.replaceChildren(newUnderline)
-                            block.dispatchChange?.()
+                            block.dispatchChange()
                         })
                     }
                 }

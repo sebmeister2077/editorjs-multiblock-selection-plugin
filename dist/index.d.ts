@@ -61,7 +61,7 @@ export default class MultiBlockSelectionPlugin {
     listen(): void;
     unlisten(): void;
     private get doBlocksHaveIds();
-    private get isVersion30();
+    private get isVersion30andUp();
     private get EditorCSS();
     private get CSS();
     private syncSelectedBlocks;
