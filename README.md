@@ -12,21 +12,22 @@ npm i editorjs-multiblock-selection-plugin
 
 ## Usage
 
-#### 1. Use the plugin after you instantiated your editor
+#### 1. Call the plugin after you created your editor
 
 ```js
 import EditorJS from '@editorjs/editorjs'
 import MultiBlockSelectionPlugin from 'editorjs-multiblock-selection-plugin'
 
-// ... create your editor with config ...
-
+const editor = new EditorJS({
+    //.. config
+})
 const blockSelection = new MultiBlockSelectionPlugin({ editor, version: EditorJS.version })
 editor.isReady.then(() => {
     blockSelection.listen()
 })
 ```
 
-#### 2. Listen to the plugins selected select block change event to sync the selected blocks
+#### 2. Listen to the plugin's selected select block change event to sync the selected blocks
 
 ```js
 let selectedBlocks = []
